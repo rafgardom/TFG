@@ -33,11 +33,13 @@ url: url contenida en la publicacion. puede contener un wildcar (parametro comod
 views: numero minimo de vistas devueltas que tiene que tener una pregunta. Nulo por defecto
 wiki: preguntas de la wiki de la comunidad. En caso de activar esta opcion: verdadero (True) o falso (False). Nulo por defecto
 
+**Return**
+El metodo la url que da habilita la llamada a la API de StackOverFlow
+
 **Nota** por razones de rendimiento si el parametro "nottagged" esta activado se debe filtrar tambien con otro parametro distinto. De cualquier
 otra forma se lanzara una excepcion que impedira la ejecucion del metodo.
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-
 def search_advanced_filter(page = None, page_size = None, from_date = None, to_date = None, order = "desc", sort = "activity",
                            q = None, accepted = None, answers = None, body = None, closed = None, notice = None,
                            not_tagged = None, tagged = None, title = None, user = None, url = None, views = None, wiki = None):
@@ -153,9 +155,11 @@ StackOverFlow.
 ** Descripcion de parametros **
 cont: contador de parametros agregados al filtro
 url: url resultante de la llamada a la API
+
+**Return**
+El metodo devuelve la url introducida adheriendo el caracter '&'
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-
 def add_aux_param(cont, url):
     if cont > 0:
         url += "&"
@@ -168,7 +172,7 @@ get_threads(page, page_size, from_date, to_date, order, sort, q, accepted, answe
                            not_tagged, tagged, title, user, url, views, wiki)
 
 ** Descripcion del metodo **
-Genera el archivo en formato JSON con la informacion extraida de la API
+Genera el archivo en formato JSON con la informacion extraida de la API para insertarla en la base de datos
 
 ** Descripcion de parametros **
 page: numero de paginas. Nulo por defecto
@@ -193,6 +197,9 @@ wiki: preguntas de la wiki de la comunidad. En caso de activar esta opcion: verd
 
 **Nota** por razones de rendimiento si el parametro "nottagged" esta activado se debe filtrar tambien con otro parametro distinto. De cualquier
 otra forma se lanzara una excepcion que impedira la ejecucion del metodo.
+
+**Return**
+None
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
 def get_threads(page = None, page_size = None, from_date = None, to_date = None, order = "desc", sort = "activity",
