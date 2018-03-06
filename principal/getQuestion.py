@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-import requests
 import urllib2
 from bs4.element import Comment
 
@@ -36,9 +35,9 @@ def get_question(url):
 
     question_comments = None
     raw_comments = raw_question.find('ul', attrs={'class': 'comments-list js-comments-list'})
-    if raw_comments:
+
+    if len(raw_comments.get_text()) > 1:
         question_comments = [get_html_text(qc) for qc in raw_comments.find_all('div', attrs={'class':'comment-body'})]
-        print question_comments
 
     return question_title, question_body, question_code, question_comments
 
@@ -83,10 +82,9 @@ El metodo devuelve una cadena de texto en formato unicode
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
 def get_html_text(soup):
-    print type(soup)
     text = soup.findAll(text=True)
     visible_text = filter(clear_html_tag, text)
     return u" ".join(t.strip() for t in visible_text)
 
 
-get_question("https://stackoverflow.com/questions/20906416/beautifulsoup-soup-prettify-gives-strange-output")
+get_question("https://stackoverflow.com/questions/237104/how-do-i-check-if-an-array-includes-an-object-in-javascript")
