@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import urllib2
 from bs4.element import Comment
+import json
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
@@ -39,7 +40,9 @@ def get_question(url):
     if len(raw_comments.get_text()) > 1:
         question_comments = [get_html_text(qc) for qc in raw_comments.find_all('div', attrs={'class':'comment-body'})]
 
-    return question_title, question_body, question_code, question_comments
+    result = {'question_title':question_title, 'question_body': question_body, 'question_code':question_code,
+              'question_comments':question_comments}
+    return result
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
@@ -87,4 +90,23 @@ def get_html_text(soup):
     return u" ".join(t.strip() for t in visible_text)
 
 
-get_question("https://stackoverflow.com/questions/237104/how-do-i-check-if-an-array-includes-an-object-in-javascript")
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+generate_question_json()
+
+** Descripcion del metodo **
+
+Genera un archivo JSON con la informacion extraida de la pregunta
+
+**Return**
+None
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def generate_question_json():
+    r = get_question(
+        "https://stackoverflow.com/questions/237104/how-do-i-check-if-an-array-includes-an-object-in-javascript?page=1&tab=votes#tab-top")
+    with open('question.json', 'w') as outfile:
+        json.dump(r, outfile)
+
+#get_question("https://stackoverflow.com/questions/237104/how-do-i-check-if-an-array-includes-an-object-in-javascript")
+#generate_question_json()

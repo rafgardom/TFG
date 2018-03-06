@@ -3,6 +3,25 @@ import urllib2
 from bs4.element import Comment
 import json
 
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+get_answer(url, answer_list, recursive)
+
+** Descripcion del metodo **
+
+A partir de la url de un hilo de StackOverFlow accede a los datos referentes a las respuestas formulada, necesarias para el analisis de la
+informacion.
+
+**Descripcion de parametros**
+url: direccion del hilo de StackOverFlow a analizar
+answer_list: lista de respuestas ya recopiladas
+recursive: flag que indica si es llamada recursiva
+
+**Return**
+El metodo devuelve un diccionario con los datos obtenidos para su conversion a formato JSON e insercion en la base de datos
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
 def get_answer(url, answer_list = None, recursive = False):
     if not recursive:
         answer_list = []
@@ -44,6 +63,22 @@ def get_answer(url, answer_list = None, recursive = False):
     return answer_list
 
 
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+clear_html_tag(element)
+
+** Descripcion del metodo **
+
+Limpia cualquier tipo de dato contenido en las etiquetas 'style', 'script', 'head', 'title', 'meta', '[document]' y 
+'grid' que haya en una cadena de texto. 
+
+**Descripcion de parametros**
+element: componente del arbol de HTML. Por defecto vacio para que filtre cualquier elemento del arbol 
+
+**Return**
+El metodo devuelve un booleano indicando si el elemento a filtrar no contiene a etiqueta (True) o contiene la etiqueta (False)
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
 def clear_html_tag(element):
     if element.parent.name in ['style', 'script', 'head', 'title', 'meta', '[document]', 'grid']:
         return False
@@ -51,16 +86,46 @@ def clear_html_tag(element):
         return False
     return True
 
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+get_html_text(soup)
+
+** Descripcion del metodo **
+
+Extrae la informacion obtenida mediante un scraping previo en forma de cadena de texto, filtrando las etiquetas 'style', 
+'script', 'head', 'title', 'meta', '[document]' y 'grid'
+
+**Descripcion de parametros**
+soup: variable de tipo bs4 (beautifulSoup) que se quiere convertir en cadena de texto. 
+
+**Return**
+El metodo devuelve una cadena de texto en formato unicode
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
 def get_html_text(soup):
     text = soup.findAll(text=True)
     visible_text = filter(clear_html_tag, text)
     return u" ".join(t.strip() for t in visible_text)
 
-def p():
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+generate_answer_json()
+
+** Descripcion del metodo **
+
+Genera un archivo JSON con la informacion extraida de las respuestas
+
+**Return**
+None
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def generate_answer_json():
     r = get_answer(
         "https://stackoverflow.com/questions/237104/how-do-i-check-if-an-array-includes-an-object-in-javascript?page=1&tab=votes#tab-top")
     print len(r)
     with open('answer.json', 'w') as outfile:
         json.dump(r, outfile)
 
-p()
+#generate_answer_json()

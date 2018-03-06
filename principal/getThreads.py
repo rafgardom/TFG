@@ -211,16 +211,14 @@ def get_threads(page = None, page_size = None, from_date = None, to_date = None,
 
     print url
     r = requests.get(url)
-    #print r.json()
     parse =  r.json()
     #print parse
     with open('data.json', 'w') as outfile:
         json.dump(parse, outfile)
 
-    print parse
 
     #Devuelve los links de los hilos leidos del documento
-    '''filename = "data.json"
+    filename = "data.json"
     items_info = []
     with open(filename, 'r') as f:
         objects = ijson.items(f, 'items')
@@ -230,6 +228,6 @@ def get_threads(page = None, page_size = None, from_date = None, to_date = None,
         #column_names = [links["link"] for links in columns[0]]
         #print column_names
         print items_info[0][1]
-    #print json.loads(parse)'''
+    #print json.loads(parse)
 
-get_threads()
+#get_threads()
