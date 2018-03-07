@@ -19,7 +19,7 @@ def generate_question_answer_json(url, question_id):
     answer_dic = getAnswer.get_answer(url)
     question_answer_dic['answers'] = answer_dic
 
-    with open('question_answer_json.json', 'w') as outfile:
+    with open('question_answer.json', 'w') as outfile:
         json.dump(question_answer_dic, outfile)
 
 
