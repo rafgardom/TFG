@@ -6,7 +6,6 @@ import json
 generate_question_answer_json(url, question_id)
 
 ** Descripcion del metodo **
-
 Genera un archivo JSON que contiene la informacion de un hilo elegido, es decir, tanto la informacion de la pregunta como 
 la de las respuestas.
 

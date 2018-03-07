@@ -8,7 +8,6 @@ import json
 get_question(url)
 
 ** Descripcion del metodo **
-
 A partir de la url de un hilo de StackOverFlow accede a los datos referentes a la pregunta formulada necesarios para el analisis de la
 informacion de la pregunta.
 
@@ -51,7 +50,6 @@ def get_question(url, question_id):
 clear_html_tag(element)
 
 ** Descripcion del metodo **
-
 Limpia cualquier tipo de dato contenido en las etiquetas 'style', 'script', 'head', 'title', 'meta', '[document]' y 
 'code' que haya en una cadena de texto. 
 
@@ -75,7 +73,6 @@ def clear_html_tag(element):
 get_html_text(soup)
 
 ** Descripcion del metodo **
-
 Extrae la informacion obtenida mediante un scraping previo en forma de cadena de texto, filtrando las etiquetas 'style', 
 'script', 'head', 'title', 'meta', '[document]' y 'code'
 
@@ -97,7 +94,6 @@ def get_html_text(soup):
 generate_question_json()
 
 ** Descripcion del metodo **
-
 Genera un archivo JSON con la informacion extraida de la pregunta
 
 **Return**

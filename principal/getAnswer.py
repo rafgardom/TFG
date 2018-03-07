@@ -9,7 +9,6 @@ import json
 get_answer(url, answer_list, recursive)
 
 ** Descripcion del metodo **
-
 A partir de la url de un hilo de StackOverFlow accede a los datos referentes a las respuestas formulada, necesarias para el analisis de la
 informacion.
 
@@ -68,7 +67,6 @@ def get_answer(url, answer_list = None, recursive = False):
 clear_html_tag(element)
 
 ** Descripcion del metodo **
-
 Limpia cualquier tipo de dato contenido en las etiquetas 'style', 'script', 'head', 'title', 'meta', '[document]' y 
 'grid' que haya en una cadena de texto. 
 
@@ -92,7 +90,6 @@ def clear_html_tag(element):
 get_html_text(soup)
 
 ** Descripcion del metodo **
-
 Extrae la informacion obtenida mediante un scraping previo en forma de cadena de texto, filtrando las etiquetas 'style', 
 'script', 'head', 'title', 'meta', '[document]' y 'grid'
 
@@ -114,7 +111,6 @@ def get_html_text(soup):
 generate_answer_json()
 
 ** Descripcion del metodo **
-
 Genera un archivo JSON con la informacion extraida de las respuestas
 
 **Return**
