@@ -15,11 +15,13 @@ informacion de la pregunta.
 **Descripcion de parametros**
 url: direccion del hilo de StackOverFlow a analizar
 
+question_id: identificador de la pregunta
+
 **Return**
 El metodo devuelve un diccionario con los datos obtenidos para su conversion a formato JSON e insercion en la base de datos
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-def get_question(url):
+def get_question(url, question_id):
     request = urllib2.Request(url)
     request.add_header('User-Agent',
                        'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.13) Gecko/2009073022 Firefox/3.0.13')
@@ -41,7 +43,7 @@ def get_question(url):
         question_comments = [get_html_text(qc) for qc in raw_comments.find_all('div', attrs={'class':'comment-body'})]
 
     result = {'question_title':question_title, 'question_body': question_body, 'question_code':question_code,
-              'question_comments':question_comments}
+              'question_comments':question_comments, 'question_id': question_id}
     return result
 
 '''
@@ -108,5 +110,7 @@ def generate_question_json():
     with open('question.json', 'w') as outfile:
         json.dump(r, outfile)
 
-#get_question("https://stackoverflow.com/questions/237104/how-do-i-check-if-an-array-includes-an-object-in-javascript")
-#generate_question_json()
+
+if __name__ == '__main__':
+    get_question("https://stackoverflow.com/questions/237104/how-do-i-check-if-an-array-includes-an-object-in-javascript")
+    generate_question_json()

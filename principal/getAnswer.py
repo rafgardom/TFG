@@ -128,4 +128,6 @@ def generate_answer_json():
     with open('answer.json', 'w') as outfile:
         json.dump(r, outfile)
 
-#generate_answer_json()
+
+if __name__ == '__main__':
+    generate_answer_json()

@@ -172,7 +172,7 @@ get_threads(page, page_size, from_date, to_date, order, sort, q, accepted, answe
                            not_tagged, tagged, title, user, url, views, wiki)
 
 ** Descripcion del metodo **
-Genera el archivo en formato JSON con la informacion extraida de la API para insertarla en la base de datos
+Genera el archivo en formato JSON con la informacion sin tratar extraida de la API para insertarla en la base de datos
 
 ** Descripcion de parametros **
 page: numero de paginas. Nulo por defecto
@@ -183,7 +183,7 @@ order: orden de hilos por fecha; ascendente (asc) o descendente (desc).Por defec
 sort: orden de hilos por parametro; actividad (activity), votos (votes), creacion (creation), relevancia (relevance). Por defecto es actividad (activity)
 q: texto libre que comparara lo introducido con las propiedades de la pregunta. Nulo por defecto
 accepted: filtro de respuestas aceptadas. En caso que se quiera activar esta opcion: Verdadero (True) o falso (False). Nulo por defecto
-answers: numero mínimo de respuestas que tiene una pregunta. Nulo por defecto
+answers: numero minimo de respuestas que tiene una pregunta. Nulo por defecto
 body: texto que debe aparecer en el cuerpo de una pregunta. Nulo por defecto
 closed: devuelve preguntas cerradas (True) o no cerradas (False). En caso de activar esta opcion: verdadero (True) o falso (False). Nulo por defecto
 notice: devuelve o no preguntas con noticias publicadas. En caso de activar esta opcion: verdadero (True) o falso (False). Nulo por defecto
@@ -199,7 +199,7 @@ wiki: preguntas de la wiki de la comunidad. En caso de activar esta opcion: verd
 otra forma se lanzara una excepcion que impedira la ejecucion del metodo.
 
 **Return**
-None
+Lista de diccionarios con datos interesantes que ofrece la API
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
 def get_threads(page = None, page_size = None, from_date = None, to_date = None, order = "desc", sort = "activity",
@@ -209,25 +209,24 @@ def get_threads(page = None, page_size = None, from_date = None, to_date = None,
     url = search_advanced_filter(page, page_size, from_date, to_date, order, sort, q, accepted, answers, body, closed, notice,
                            not_tagged, tagged, title, user, url, views, wiki)
 
-    print url
     r = requests.get(url)
     parse =  r.json()
     #print parse
-    with open('data.json', 'w') as outfile:
+    with open('raw_api_data.json', 'w') as outfile:
         json.dump(parse, outfile)
 
 
     #Devuelve los links de los hilos leidos del documento
-    filename = "data.json"
+    filename = "raw_api_data.json"
     items_info = []
     with open(filename, 'r') as f:
         objects = ijson.items(f, 'items')
         columns = list(objects)
         for col in columns[0]:
-            items_info.append([col["link"], col["tags"], col["answer_count"], col["score"], col["title"], col["question_id"]])
-        #column_names = [links["link"] for links in columns[0]]
-        #print column_names
-        print items_info[0][1]
-    #print json.loads(parse)
+            #items_info.append([col["link"], col["tags"], col["answer_count"], col["score"], col["title"], col["question_id"]])
+            dic = {'link': col["link"], 'tags': col["tags"], 'answer_count': col["answer_count"], 'score': col["score"],
+                                                'question_id': col["question_id"]}
+            items_info.append(dic)
 
-#get_threads()
+    return items_info
+
