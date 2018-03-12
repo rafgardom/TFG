@@ -13,7 +13,6 @@ informacion de la pregunta.
 
 **Descripcion de parametros**
 url: direccion del hilo de StackOverFlow a analizar
-
 question_id: identificador de la pregunta
 
 **Return**
@@ -96,17 +95,20 @@ generate_question_json()
 ** Descripcion del metodo **
 Genera un archivo JSON con la informacion extraida de la pregunta
 
+**Descripcion de parametros**
+url: direccion del hilo de StackOverFlow
+question_id: identificador de la pregunta
+
 **Return**
 None
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-def generate_question_json():
-    r = get_question(
-        "https://stackoverflow.com/questions/237104/how-do-i-check-if-an-array-includes-an-object-in-javascript?page=1&tab=votes#tab-top")
+def generate_question_json(url, question_id):
+    r = get_question(url, question_id)
     with open('question.json', 'w') as outfile:
         json.dump(r, outfile)
 
 
 if __name__ == '__main__':
-    get_question("https://stackoverflow.com/questions/237104/how-do-i-check-if-an-array-includes-an-object-in-javascript")
-    generate_question_json()
+    get_question("https://stackoverflow.com/questions/950087/how-do-i-include-a-javascript-file-in-another-javascript-file", 950087)
+    generate_question_json("https://stackoverflow.com/questions/950087/how-do-i-include-a-javascript-file-in-another-javascript-file", 950087)

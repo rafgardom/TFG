@@ -20,118 +20,46 @@ def connection():
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
-insert_question_answer(document)
+api_data_find_by_questionId(id, db_connection)
 
 ** Descripcion del metodo **
-Inserta documentos en la coleccion "question_answer"
+Realiza la busqueda del documento dentro de la coleccion 'api_data' filtrando por el id de la pregunta
 
 ** Descripcion de parametros **
-document: documento a insertar (en formato JSON)
+id: identificador de la pregunta
+db_connection: conexion con la base de datos
 
 **Return**
-None
+documento encontrado o None si no encuentra ninguno
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-def insert_question_answer(document):
-    db = connection()
-    parsed = json.loads(document.read())
-    collection = db.question_answer
-    collection.insert(parsed)
+def api_data_find_by_questionId(id, db_connection):
+    db = db_connection
+    question = db.api_data.find_one({'question_id': id})
+    return question
 
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
-insert_api_data(document)
+question_answer_find_by_questionId(id, db_connection)
 
 ** Descripcion del metodo **
-Inserta documentos en la coleccion "api_data"
+Realiza la busqueda del documento dentro de la coleccion 'question_answer' filtrando por el id de la pregunta
 
 ** Descripcion de parametros **
-document: documento a insertar (en formato JSON)
+id: identificador de la pregunta
+db_connection: conexion con la base de datos
 
 **Return**
-None
+documento encontrado o None si no encuentra ninguno
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-def insert_api_data(document):
+def question_answer_find_by_questionId(id, db_connection):
+    db = db_connection
+    question = db.question_answer.find_one({'question_id': id})
+    return question
+
+if __name__=='__main__':
     db = connection()
-    parsed = json.loads(document.read())
-    collection = db.api_data
-    collection.insert(parsed)
-
-
-'''
-/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
-insert_raw_api_data(document)
-
-** Descripcion del metodo **
-Inserta documentos en la coleccion "raw_api_data"
-
-** Descripcion de parametros **
-document: documento a insertar (en formato JSON)
-
-**Return**
-None
-/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
-'''
-def insert_raw_api_data(document):
-    db = connection()
-    parsed = json.loads(document.read())
-    collection = db.raw_api_data
-    collection.insert(parsed)
-
-
-'''
-/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
-insert_question(document)
-
-** Descripcion del metodo **
-Inserta documentos en la coleccion "question"
-
-** Descripcion de parametros **
-document: documento a insertar (en formato JSON)
-
-**Return**
-None
-/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
-'''
-def insert_question(document):
-    db = connection()
-    parsed = json.loads(document.read())
-    collection = db.question
-    collection.insert(parsed)
-
-
-'''
-/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
-insert_answer(document)
-
-** Descripcion del metodo **
-Inserta documentos en la coleccion "answer"
-
-** Descripcion de parametros **
-document: documento a insertar (en formato JSON)
-
-**Return**
-None
-/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
-'''
-def insert_answer(document):
-    db = connection()
-    parsed = json.loads(document.read())
-    collection = db.answer
-    collection.insert(parsed)
-
-
-if __name__ == '__main__':
-    question_answer = open("question_answer.json", 'r')
-    api_data = open("api_data.json", 'r')
-    raw_api_data = open("raw_api_data.json", 'r')
-    question = open("question.json", 'r')
-    answer = open("answer.json", 'r')
-
-    insert_question_answer(question_answer)
-    insert_api_data(api_data)
-    insert_raw_api_data(raw_api_data)
-    insert_question(question)
-    insert_answer(answer)
+    print api_data_find_by_questionId(950087, db)
+    print question_answer_find_by_questionId(950087, db)

@@ -15,7 +15,7 @@ None
 '''
 def generate_question_answer_json(url, question_id):
     question_answer_dic = getQuestion.get_question(url, question_id)
-    answer_dic = getAnswer.get_answer(url)
+    answer_dic = getAnswer.get_answer(url, question_id)
     question_answer_dic['answers'] = answer_dic
 
     with open('question_answer.json', 'w') as outfile:
@@ -73,7 +73,7 @@ def generate_processed_api_data_json(page = None, page_size = None, from_date = 
 
 
 if __name__ == '__main__':
+    generate_processed_api_data_json(answers=40)
     generate_question_answer_json(
-        "https://stackoverflow.com/questions/237104/how-do-i-check-if-an-array-includes-an-object-in-javascript?page=1&tab=votes#tab-top",
-        4448877854)
-    generate_processed_api_data_json()
+        "https://stackoverflow.com/questions/950087/how-do-i-include-a-javascript-file-in-another-javascript-file",
+        950087)

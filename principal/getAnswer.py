@@ -14,6 +14,7 @@ informacion.
 
 **Descripcion de parametros**
 url: direccion del hilo de StackOverFlow a analizar
+question_id: identificador de la pregunta
 answer_list: lista de respuestas ya recopiladas
 recursive: flag que indica si es llamada recursiva
 
@@ -21,7 +22,7 @@ recursive: flag que indica si es llamada recursiva
 El metodo devuelve un diccionario con los datos obtenidos para su conversion a formato JSON e insercion en la base de datos
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-def get_answer(url, answer_list = None, recursive = False):
+def get_answer(url, question_id, answer_list=None, recursive = False):
     if not recursive:
         answer_list = []
 
@@ -53,11 +54,12 @@ def get_answer(url, answer_list = None, recursive = False):
         if len(raw_comments.get_text()) > 1:
             answer_comments = [get_html_text(ac) for ac in raw_comments.find_all('div', attrs={'class':'comment-body'})]
 
-        answer_dict = {'answer_body':answer_body, 'answer_comments': answer_comments, 'answer_votes':answer_votes}
+        answer_dict = {'answer_body':answer_body, 'answer_comments': answer_comments, 'answer_votes':answer_votes, 'question_id' : question_id}
+
         answer_list.append(answer_dict)
 
     if next_page:
-        get_answer(next_page, answer_list, recursive=True)
+        get_answer(next_page, question_id, answer_list, recursive=True)
 
     return answer_list
 
@@ -119,7 +121,7 @@ None
 '''
 def generate_answer_json():
     r = get_answer(
-        "https://stackoverflow.com/questions/237104/how-do-i-check-if-an-array-includes-an-object-in-javascript?page=1&tab=votes#tab-top")
+        "https://stackoverflow.com/questions/950087/how-do-i-include-a-javascript-file-in-another-javascript-file", 950087)
     print len(r)
     with open('answer.json', 'w') as outfile:
         json.dump(r, outfile)
