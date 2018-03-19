@@ -1,5 +1,5 @@
-from pymongo import MongoClient
-import json
+import pymongo
+import json, operator
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
@@ -13,7 +13,7 @@ conexion
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
 def connection():
-    client = MongoClient('localhost', 27017)
+    client = pymongo.MongoClient('localhost', 27017)
     db = client['TFG']
     return db
 
@@ -26,16 +26,16 @@ api_data_find_by_questionId(id, db_connection)
 Realiza la busqueda del documento dentro de la coleccion 'api_data' filtrando por el id de la pregunta
 
 ** Descripcion de parametros **
-id: identificador de la pregunta
+question_id: identificador de la pregunta
 db_connection: conexion con la base de datos
 
 **Return**
 documento encontrado o None si no encuentra ninguno
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-def api_data_find_by_questionId(id, db_connection):
+def api_data_find_by_questionId(question_id, db_connection):
     db = db_connection
-    question = db.api_data.find_one({'question_id': id})
+    question = db.api_data.find_one({'question_id': question_id})
     return question
 
 
@@ -47,17 +47,18 @@ question_answer_find_by_questionId(id, db_connection)
 Realiza la busqueda del documento dentro de la coleccion 'question_answer' filtrando por el id de la pregunta
 
 ** Descripcion de parametros **
-id: identificador de la pregunta
+question_id: identificador de la pregunta
 db_connection: conexion con la base de datos
 
 **Return**
 documento encontrado o None si no encuentra ninguno
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-def question_answer_find_by_questionId(id, db_connection):
+def question_answer_find_by_questionId(question_id, db_connection):
     db = db_connection
-    question = db.question_answer.find_one({'question_id': id})
+    question = db.question_answer.find_one({'question_id': question_id})
     return question
+
 
 if __name__=='__main__':
     db = connection()
