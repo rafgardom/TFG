@@ -3,6 +3,7 @@ import databaseConnection as dbc
 import warnings
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 import gensim
+from nltk.text import Text
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
@@ -73,7 +74,8 @@ answers: lista de cuerpos de respuestas a analizar
 question_body: cuerpo de la pregunta a analizar
 
 **Return**
-Lista de respuestas ordenadas segun su indice de similaridad respecto a la pregunta
+Lista de respuestas ordenadas segun su indice de similaridad respecto a la pregunta.
+La lista es una lista de listas de respuestas con su puntuacion de similaridad: [[answer, punctuation]]
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
 def gensim_similarity_tf_idf(answers, question_body):
@@ -101,23 +103,68 @@ def gensim_similarity_tf_idf(answers, question_body):
 
     '''Ordenamos las respuestas segun su indice de similaridad respecto a la pregunta'''
     sorted_similarity_answers = sorted(indexed_similarity_list, key=lambda answer: answer[1], reverse=True)
+    print "Similaridad de las respuestas en base a la pregunta:"
     print sorted_similarity_answers
 
     '''Ahora devolvemos las respuestas segun su orden de aparicion'''
     for i in sorted_similarity_answers:
         result.append([answers[i[0]], i[1]])
 
-    print result
+    return result
 
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+gensim_similarity_tf_idf(answers, question_body)
+
+** Descripcion del metodo **
+Analiza las palabras del titulo de la pregunta y clasifica las respuestas segun el numero de apariciones que tengan las palabras
+del titulo de la pregunta.
+A mayor numero de aparicion tenga la palabra en el titulo de la pregunta mayor peso tiene esa palabra a la hora de calcular
+la puntuacion.
+
+** Descripcion de parametros **
+question_title: titulo de la pregunta
+answers: respuestas
+
+**Return**
+Lista de respuestas ordenadas segun su puntuacion de frecuencia de palabras respecto al titulo de la pregunta.
+La lista es una lista de listas de respuestas con su puntuacion de frecuencia: [[answer, punctuation]]
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def nltk_title_analyze(question_title, answers):
+    token_question_title = tokenize_text(question_title)
+    text = Text(token_question_title)
+
+    title_frequence_dist = nltk.FreqDist(text)
+    first_title_frequence_dist = title_frequence_dist.most_common(5)
+    print "Frecuencia de las palabras del titulo de la pregunta:"
+    print first_title_frequence_dist
+    #text.common_contexts("How")
+
+    freq_dist_puntuation_list = []
+
+    for answer in answers:
+        answer_puntuation = 0
+        token_answer = tokenize_text(answer["answer_body"])
+        text_token_answer = Text(token_answer)
+        for tupla in first_title_frequence_dist:
+            punctuation = text_token_answer.count(tupla[0]) * tupla[1]
+            answer_puntuation += punctuation
+
+        freq_dist_puntuation_list.append([answer, answer_puntuation])
+
+    freq_dist_puntuation_list = sorted(freq_dist_puntuation_list, key=lambda answer: answer[1], reverse=True)
+
+    return freq_dist_puntuation_list
 
 
 if __name__=='__main__':
     db = dbc.connection()
     answers = dbc.question_answer_find_by_questionId(950087, db)['answers']
     question_body = dbc.question_answer_find_by_questionId(950087, db)['question_body']
-    token_answers = tokenize_answers_body(answers)
-    token_question_body = tokenize_text(question_body)
+    question_title = dbc.question_answer_find_by_questionId(950087, db)['question_title']
 
-    gensim_similarity_tf_idf(answers, question_body)
+    print gensim_similarity_tf_idf(answers, question_body)
+    print nltk_title_analyze(question_title, answers)
 
 
