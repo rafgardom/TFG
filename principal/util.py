@@ -20,7 +20,7 @@ texto tokenizado
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
 def tokenize_text(text):
-    tokens = nltk.word_tokenize(text)
+    tokens = nltk.word_tokenize(text.encode("ascii", "ignore"))
     return tokens
 
 
@@ -58,63 +58,71 @@ Lista de preguntas tokenizadas
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
 def tokenize_answers_body(answers):
-    return [tokenize_text(answer["answer_body"]) for answer in answers]
+    return [tokenize_text(answer["answer_body"].encode("ascii", "ignore")) for answer in answers]
 
 
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
-gensim_similarity_tf_idf(answers, question_body)
+gensim_similarity_tf_idf(answers, question)
 
 ** Descripcion del metodo **
 Analiza la similaridad de las respuestas respecto a la pregunta pasada como parametro
 
 ** Descripcion de parametros **
 answers: lista de cuerpos de respuestas a analizar
-question_body: cuerpo de la pregunta a analizar
+question: parte de la pregunta a analizar
 
 **Return**
 Lista de respuestas ordenadas segun su indice de similaridad respecto a la pregunta.
 La lista es una lista de listas de respuestas con su puntuacion de similaridad: [[answer, punctuation]]
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-def gensim_similarity_tf_idf(answers, question_body):
-    result = []
-    token_answers_body = tokenize_answers_body(answers)
-    dictionary = gensim.corpora.Dictionary(token_answers_body)
-    corpus = [dictionary.doc2bow(answer) for answer in token_answers_body]
-    #print corpus
-    tf_idf = gensim.models.TfidfModel(corpus)
-    #print(tf_idf)
-    sims = gensim.similarities.Similarity(None, tf_idf[corpus],
-                                         num_features=len(dictionary))
+def gensim_similarity_tf_idf(answers, question):
+    if question != None:
+        result = []
 
-    '''Tokenizamos la pregunta para comparar su distancia (tf-idf) con las respuestas ya procesadas'''
-    query_question = tokenize_text(question_body)
-    query_question_bow = dictionary.doc2bow(query_question)
-    query_question_tf_idf = tf_idf[query_question_bow]
-    similarity_list = sims[query_question_tf_idf]
+        token_answers_body = tokenize_answers_body(answers)
+        dictionary = gensim.corpora.Dictionary(token_answers_body)
+        corpus = [dictionary.doc2bow(answer) for answer in token_answers_body]
+        #print corpus
+        tf_idf = gensim.models.TfidfModel(corpus)
+        #print(tf_idf)
+        sims = gensim.similarities.Similarity(None, tf_idf[corpus],
+                                             num_features=len(dictionary))
 
-    indexed_similarity_list = []
-    cont = 0
-    for item in similarity_list:
-        indexed_similarity_list.append([cont, item])
-        cont += 1
+        '''Tokenizamos la pregunta para comparar su distancia (tf-idf) con las respuestas ya procesadas'''
+        if len(question) > 1:
+            query_question = tokenize_text(question)
+        else:
+            query_question = question
 
-    '''Ordenamos las respuestas segun su indice de similaridad respecto a la pregunta'''
-    sorted_similarity_answers = sorted(indexed_similarity_list, key=lambda answer: answer[1], reverse=True)
-    print "Similaridad de las respuestas en base a la pregunta:"
-    print sorted_similarity_answers
+        query_question_bow = dictionary.doc2bow(query_question)
+        query_question_tf_idf = tf_idf[query_question_bow]
+        similarity_list = sims[query_question_tf_idf]
 
-    '''Ahora devolvemos las respuestas segun su orden de aparicion'''
-    for i in sorted_similarity_answers:
-        result.append([answers[i[0]], i[1]])
+        indexed_similarity_list = []
+        cont = 0
+        for item in similarity_list:
+            indexed_similarity_list.append([cont, item])
+            cont += 1
 
-    return result
+        '''Ordenamos las respuestas segun su indice de similaridad respecto a la pregunta'''
+        sorted_similarity_answers = sorted(indexed_similarity_list, key=lambda answer: answer[1], reverse=True)
+        print "Similaridad de las respuestas en base a la pregunta:"
+        print sorted_similarity_answers
+
+        '''Ahora devolvemos las respuestas segun su orden de aparicion'''
+        for i in sorted_similarity_answers:
+            result.append([answers[i[0]], i[1]])
+
+        return result
+    else:
+        print"El elemento de la pregunta que ha pasado como parametro es nulo"
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
-gensim_similarity_tf_idf(answers, question_body)
+nltk_title_analyze(question, answers)
 
 ** Descripcion del metodo **
 Analiza las palabras del titulo de la pregunta y clasifica las respuestas segun el numero de apariciones que tengan las palabras
@@ -123,7 +131,7 @@ A mayor numero de aparicion tenga la palabra en el titulo de la pregunta mayor p
 la puntuacion.
 
 ** Descripcion de parametros **
-question_title: titulo de la pregunta
+question: parte de la pregunta a analizar
 answers: respuestas
 
 **Return**
@@ -131,40 +139,140 @@ Lista de respuestas ordenadas segun su puntuacion de frecuencia de palabras resp
 La lista es una lista de listas de respuestas con su puntuacion de frecuencia: [[answer, punctuation]]
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-def nltk_title_analyze(question_title, answers):
-    token_question_title = tokenize_text(question_title)
-    text = Text(token_question_title)
+def nltk_title_analyze(question, answers):
+    if question != None:
+        if len(question) > 1:
+            token_question = tokenize_text(question)
+        else:
+            token_question = question
 
-    title_frequence_dist = nltk.FreqDist(text)
-    first_title_frequence_dist = title_frequence_dist.most_common(5)
-    print "Frecuencia de las palabras del titulo de la pregunta:"
-    print first_title_frequence_dist
-    #text.common_contexts("How")
+        text = Text(token_question)
 
-    freq_dist_puntuation_list = []
+        title_frequence_dist = nltk.FreqDist(text)
+        first_title_frequence_dist = title_frequence_dist.most_common(20)
+        #print "Frecuencia de las palabras del titulo de la pregunta:"
+        #print first_title_frequence_dist
 
+        freq_dist_puntuation_list = []
+
+        for answer in answers:
+            answer_puntuation = 0
+            token_answer = tokenize_text(answer["answer_body"])
+            text_token_answer = Text(token_answer)
+            for tupla in first_title_frequence_dist:
+                punctuation = text_token_answer.count(tupla[0]) * tupla[1]
+                answer_puntuation += punctuation
+
+            freq_dist_puntuation_list.append([answer, answer_puntuation])
+
+        freq_dist_puntuation_list = sorted(freq_dist_puntuation_list, key=lambda answer: answer[1], reverse=True)
+        index_processed_list = []
+        for i in freq_dist_puntuation_list:
+            index = answers.index(i[0])
+            index_processed_list.append([index, i[1]])
+
+        print "Posicion de los resultados vs puntuacion:"
+        print index_processed_list
+        return freq_dist_puntuation_list
+    else:
+        print"El elemento de la pregunta que ha pasado como parametro es nulo"
+
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+question_code_processing(question_code)
+
+** Descripcion del metodo **
+Procesa los caracteres irrelevantes del codigo
+
+** Descripcion de parametros **
+question_code: codigo de la pregunta
+
+**Return**
+codigo de la pregunta procesado
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def question_code_processing(question_code):
+    result = None
+    for i in question_code:
+        result = i.replace("@", "")
+        result = result.replace("$", "")
+        result = result.replace("{", "")
+        result = result.replace("}", "")
+        result = result.replace("(", "")
+        result = result.replace(")", "")
+        result = result.replace(":", "")
+    return result
+
+
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+merge_results(similarity_results, frequence_results, answers)
+
+** Descripcion del metodo **
+Union de resultados por puntuacion de similaridad y frecuencia
+
+** Descripcion de parametros **
+similarity_results: resultados de similaridad
+frequence_results: resultados de frecuencia
+answers: preguntas iniciales
+
+**Return**
+lista con la respuesta y su puntuacion global asignada
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def merge_results(similarity_results, frequence_results, answers):
+    answers_resulting = []
     for answer in answers:
-        answer_puntuation = 0
-        token_answer = tokenize_text(answer["answer_body"])
-        text_token_answer = Text(token_answer)
-        for tupla in first_title_frequence_dist:
-            punctuation = text_token_answer.count(tupla[0]) * tupla[1]
-            answer_puntuation += punctuation
+        global_puctuation = 0
+        similarity_punctuation = 0
+        frequency_puntuation = 0
+        for sub_list in similarity_results:
+            if sub_list[0] == answer:
+                similarity_punctuation = sub_list[1]
+        for sub_list in frequence_results:
+            if sub_list[0] == answer:
+                frequency_puntuation = sub_list[1]
 
-        freq_dist_puntuation_list.append([answer, answer_puntuation])
+        global_puctuation = similarity_punctuation * frequency_puntuation
+        answers_resulting.append([answer, global_puctuation])
 
-    freq_dist_puntuation_list = sorted(freq_dist_puntuation_list, key=lambda answer: answer[1], reverse=True)
+    answers_resulting = sorted(answers_resulting, key=lambda answer: answer[1], reverse=True)
+    return answers_resulting
 
-    return freq_dist_puntuation_list
 
 
 if __name__=='__main__':
     db = dbc.connection()
-    answers = dbc.question_answer_find_by_questionId(950087, db)['answers']
-    question_body = dbc.question_answer_find_by_questionId(950087, db)['question_body']
-    question_title = dbc.question_answer_find_by_questionId(950087, db)['question_title']
+    answers = dbc.question_answer_find_by_questionId(17421104, db)['answers']
+    question_body = dbc.question_answer_find_by_questionId(17421104, db)['question_body']
+    question_title = dbc.question_answer_find_by_questionId(17421104, db)['question_title']
+    question_code = dbc.question_answer_find_by_questionId(17421104, db)['question_code']
 
-    print gensim_similarity_tf_idf(answers, question_body)
-    print nltk_title_analyze(question_title, answers)
+    processed_question_code = question_code_processing(question_code)
+
+    print "***Analisis por similaridad con distancia tf-idf respecto al cuerpo de la pregunta***"
+    gensim_similarity_tf_idf_body_result = gensim_similarity_tf_idf(answers, question_body)
+    print gensim_similarity_tf_idf_body_result
+    print " "
+    print "***Analisis por similaridad con distancia tf-idf respecto al codigo de la pregunta***"
+    gensim_similarity_tf_idf_code_result = gensim_similarity_tf_idf(answers, processed_question_code)
+    print gensim_similarity_tf_idf_code_result
+    print " "
+    print "***Analisis por frecuencia de aparicion de palabras del titulo de la pregunta***"
+    nltk_title_analyze_title_result = nltk_title_analyze(question_title, answers)
+    print nltk_title_analyze_title_result
+    print " "
+    print "***Analisis por frecuencia de aparicion de palabras del codigo de la pregunta***"
+    nltk_title_analyze_code_result = nltk_title_analyze(processed_question_code, answers)
+    print nltk_title_analyze_code_result
+
+    print "********************************************************"
+    print "Clasificacion agrupando los resultados cuerpo y titulo de la pregunta"
+    print merge_results(gensim_similarity_tf_idf_body_result, nltk_title_analyze_title_result, answers)
+    print " "
+    print "Clasificacion agrupando los resultados de codigo de la pregunta"
+    print merge_results(gensim_similarity_tf_idf_code_result, nltk_title_analyze_code_result, answers)
 
 
