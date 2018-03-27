@@ -4,6 +4,8 @@ import warnings
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 import gensim
 from nltk.text import Text
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
@@ -243,6 +245,129 @@ def merge_results(similarity_results, frequence_results, answers):
 
 
 
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+K_means_clustering(question_body, question_title, answers, cluster_number)
+
+** Descripcion del metodo **
+Agrupa los terminos de las pregunta y las respuestas en clusters identificando las palabras claves sobre lo que se
+pregunta y responde
+
+** Descripcion de parametros **
+question_body: cuerpo de la pregunta
+question_title: titulo de la pregunta
+answers: respuestas
+cluster_number: numero de clusteres a crear para clasificar las respuestas
+
+**Return**
+Lista con los terminos de los clusteres de la pregunta y las respuestas.
+returned list([clustered_question_term][clustered_answer_terms])
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def K_means_clustering(question_body, question_title, answers, cluster_number):
+    title = str(question_title.encode("utf-8"))
+    body = str(question_body.encode("utf-8"))
+    answers_document = []
+    for answer in answers:
+        answer_body = str(answer["answer_body"].encode("utf-8"))
+        answers_document.append(answer_body)
+    question_documents = [title, body]
+    question_vectorizer = TfidfVectorizer(stop_words='english')
+    answer_vectorizer = TfidfVectorizer(stop_words='english')
+    vectoriced_question_document = question_vectorizer.fit_transform(question_documents)
+    vectoriced_answers_document = answer_vectorizer.fit_transform(answers_document)
+
+    question_model = KMeans(n_clusters=2, init='k-means++', max_iter=100, n_init=1)
+    question_model.fit(vectoriced_question_document)
+
+    answer_model = KMeans(n_clusters=cluster_number, init='k-means++', max_iter=100, n_init=1)
+    answer_model.fit(vectoriced_answers_document)
+
+    print("Top terms per question_clusters:")
+    question_order_centroids = question_model.cluster_centers_.argsort()[:, ::-1]
+    question_terms = question_vectorizer.get_feature_names()
+
+    answer_order_centroids = answer_model.cluster_centers_.argsort()[:, ::-1]
+    answer_terms = answer_vectorizer.get_feature_names()
+
+    resulting_question_term = []
+    resulting_answer_term = []
+
+    for cluster in range(2):
+        [resulting_question_term.append(question_terms[i]) for i in question_order_centroids[cluster][:5]]
+
+    for cluster in range(cluster_number):
+        [resulting_answer_term.append(answer_terms[i]) for i in answer_order_centroids[cluster][:10]]
+
+    print "Question terms"
+    print resulting_question_term
+    print "Answer terms"
+    print resulting_answer_term
+
+    return [resulting_question_term, resulting_answer_term]
+
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+matching_clustering(K_means_clustering_result)
+
+** Descripcion del metodo **
+Compara los terminos iguales en los clusteres 
+
+** Descripcion de parametros **
+K_means_clustering_result: resultado de la ejecucion del metodo "K_means_clustering"
+
+**Return**
+Lista con los terminos que aparecen en ambos conjuntos de clusteres
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def matching_clustering(K_means_clustering_result):
+    result = []
+    question_cluster = K_means_clustering_result[0]
+    answer_cluster = K_means_clustering_result[1]
+
+    for i in question_cluster:
+        if i in answer_cluster:
+            result.append(i)
+
+    print result
+    return result
+
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+ranking_K_means(matching, answers)
+
+** Descripcion del metodo **
+Elabora un ranking de respuestas segun los terminos clusterizados mediante el algoritmo de K_means
+
+** Descripcion de parametros **
+matching: resultado de la ejecucion del metodo "matching_clustering"
+answers: respuestas a clasificar
+
+**Return**
+Lista con las respuestas ordenadas segun su clasificacion con la puntuacion que han obtenido
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def ranking_K_means(matching, answers):
+    result = []
+    for answer in answers:
+        answer_punctuation = 0
+        for term in matching:
+            if term in answer["answer_body"]:
+                answer_punctuation += 1
+
+        result.append([answer, answer_punctuation])
+
+    result = sorted(result, key=lambda answer: answer[1], reverse=True)
+    index_processed_list = []
+    for i in result:
+        index = answers.index(i[0])
+        index_processed_list.append([index, i[1]])
+    print index_processed_list
+    print result[2]
+
+
 if __name__=='__main__':
     db = dbc.connection()
     answers = dbc.question_answer_find_by_questionId(17421104, db)['answers']
@@ -274,5 +399,16 @@ if __name__=='__main__':
     print " "
     print "Clasificacion agrupando los resultados de codigo de la pregunta"
     print merge_results(gensim_similarity_tf_idf_code_result, nltk_title_analyze_code_result, answers)
+
+    '''****** K means analysis ******'''
+    print "****** K means analysis ******"
+    resulting = K_means_clustering(question_body, question_title, answers, 2)
+    print "Matching cluster terms:"
+    matching = matching_clustering(resulting)
+    print "Ranking result"
+    ranking_K_means(matching, answers)
+
+
+
 
 
