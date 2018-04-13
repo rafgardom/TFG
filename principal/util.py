@@ -10,6 +10,7 @@ from nltk.stem.snowball import SnowballStemmer
 import re
 import pandas as pd
 import sys
+import time
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -305,11 +306,14 @@ answers: respuestas
 cluster_number: numero de clusteres a crear para clasificar las respuestas
 
 **Return**
-Lista de listas de respuestas que contienen la respuesta y la puntuacion que ha obtenido
-returned list([answer, punctuation])
+Lista que contiene una lista con las respuestas clasificadas de forma global (con la puntuacion obtenida a traves de la 
+clasificacion de clusteres) y otra lista con las mejores respuestas candidatas, que se corresponden con la mejor respuesta
+dentro de cada cluster.
+returned list([answer, punctuation], [best_cluster_answer, punctuation])
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
 def K_means_clustering(question_body, question_title, answers, cluster_number):
+    start_time = time.time()
     title = str(question_title.encode("utf-8"))
     body = str(question_body.encode("utf-8"))
     answers_document = []
@@ -331,7 +335,7 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
     answer_model = KMeans(n_clusters=cluster_number, init='k-means++', max_iter=100, n_init=1)
     answer_model.fit(vectoriced_answers_document)
 
-    print("Top terms per question_clusters:")
+    print("Terminos tomados en los clusteres:")
 
     '''question_order_centroids = question_model.cluster_centers_.argsort()[:, ::-1]
     question_terms = tfidf_question_vectorizer.get_feature_names()'''
@@ -344,6 +348,9 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
 
     answer_data = {'answers': answers_document, 'cluster': clusters}
     frame = pd.DataFrame(answer_data, index=[clusters], columns=['answers', 'cluster'])
+
+    print "Clasificacion de respuestas en clusteres:"
+    print frame
 
     clustered_answers_dict = {}
     for i in range(cluster_number):
@@ -374,20 +381,36 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
             for answer in answers:
                 aux_answer = answer["answer_body"]
                 if aux_answer == n:
-                    final_result.append([answer, clustering_punctuation[i][1]])
+                    final_result.append([answer, clustering_punctuation[i][1], i])
 
 
 
     final_result = sorted(final_result, key=lambda answer: answer[1], reverse=True)
-    return final_result
+
+    best_of_cluster = []
+    for cluster in range(cluster_number):
+        for i in final_result:
+            if i[2] == cluster:
+                best_of_cluster.append(i)
+                break
+
+    best_of_cluster = sorted(best_of_cluster, key=lambda answer: answer[1], reverse=True)
+
+    end_time = time.time()
+    total_time = end_time - start_time
+    print "Tiempo de ejecucion: " , total_time
+    print
+    print
+    return [final_result, best_of_cluster]
 
 
 if __name__=='__main__':
     db = dbc.connection()
-    answers = dbc.question_answer_find_by_questionId(17421104, db)['answers']
-    question_body = dbc.question_answer_find_by_questionId(17421104, db)['question_body']
-    question_title = dbc.question_answer_find_by_questionId(17421104, db)['question_title']
-    question_code = dbc.question_answer_find_by_questionId(17421104, db)['question_code']
+    question_id = 40480
+    answers = dbc.question_answer_find_by_questionId(question_id, db)['answers']
+    question_body = dbc.question_answer_find_by_questionId(question_id, db)['question_body']
+    question_title = dbc.question_answer_find_by_questionId(question_id, db)['question_title']
+    question_code = dbc.question_answer_find_by_questionId(question_id, db)['question_code']
 
     processed_question_code = question_code_processing(question_code)
 
@@ -395,29 +418,42 @@ if __name__=='__main__':
     gensim_similarity_tf_idf_body_result = gensim_similarity_tf_idf(answers, question_body)
     print gensim_similarity_tf_idf_body_result
     print " "
+
     print "***Analisis por similaridad con distancia tf-idf respecto al codigo de la pregunta***"
-    gensim_similarity_tf_idf_code_result = gensim_similarity_tf_idf(answers, processed_question_code)
-    print gensim_similarity_tf_idf_code_result
-    print " "
+    if processed_question_code:
+        gensim_similarity_tf_idf_code_result = gensim_similarity_tf_idf(answers, processed_question_code)
+        print gensim_similarity_tf_idf_code_result
+        print " "
+
     print "***Analisis por frecuencia de aparicion de palabras del titulo de la pregunta***"
     nltk_title_analyze_title_result = nltk_title_analyze(question_title, answers)
     print nltk_title_analyze_title_result
     print " "
-    print "***Analisis por frecuencia de aparicion de palabras del codigo de la pregunta***"
-    nltk_title_analyze_code_result = nltk_title_analyze(processed_question_code, answers)
-    print nltk_title_analyze_code_result
+    if processed_question_code:
+        print "***Analisis por frecuencia de aparicion de palabras del codigo de la pregunta***"
+        nltk_title_analyze_code_result = nltk_title_analyze(processed_question_code, answers)
+        print nltk_title_analyze_code_result
+        print " "
 
     print "********************************************************"
     print "Clasificacion agrupando los resultados cuerpo y titulo de la pregunta"
     print merge_results(gensim_similarity_tf_idf_body_result, nltk_title_analyze_title_result, answers)
     print
-    print "Clasificacion agrupando los resultados de codigo de la pregunta"
-    print merge_results(gensim_similarity_tf_idf_code_result, nltk_title_analyze_code_result, answers)
-
+    if processed_question_code:
+        print "Clasificacion agrupando los resultados de codigo de la pregunta"
+        print merge_results(gensim_similarity_tf_idf_code_result, nltk_title_analyze_code_result, answers)
+        print
     '''****** K means analysis ******'''
     print "****** K means analysis ******"
     K_means_clustering_result = K_means_clustering(question_body, question_title, answers, 5)
+    print "Resultado general en bruto"
     print K_means_clustering_result
+    print
+    print "Resultado clasificacion de respuestas de forma global (primer valor del resultado de la ejecucion de 'K_means_clustering'"
+    print K_means_clustering_result[0]
+    print
+    print "Resultado clasificacion de respuestas estimada (segundo valor del resultado de la ejecucion de 'K_means_clustering'"
+    print K_means_clustering_result[1]
 
 
 
