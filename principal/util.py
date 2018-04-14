@@ -307,9 +307,9 @@ cluster_number: numero de clusteres a crear para clasificar las respuestas
 
 **Return**
 Lista que contiene una lista con las respuestas clasificadas de forma global (con la puntuacion obtenida a traves de la 
-clasificacion de clusteres) y otra lista con las mejores respuestas candidatas, que se corresponden con la mejor respuesta
-dentro de cada cluster.
-returned list([answer, punctuation], [best_cluster_answer, punctuation])
+clasificacion de clusteres), otra lista con las respuestas ordenadas por cluster de mayor puntuacion a menor y otra lista 
+con las mejores respuestas candidatas, que se corresponden con la mejor respuesta dentro de cada cluster.
+returned list([answer, punctuation], [final_result_group_by_cluster] [best_cluster_answer, punctuation])
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
 def K_means_clustering(question_body, question_title, answers, cluster_number):
@@ -375,6 +375,7 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
         clustering_punctuation.append([i, punctuation])
 
     final_result = []
+
     '''Agregando puntuaciones a las respuestas'''
     for i in range(cluster_number):
         for n in clustered_answers_dict[i]:
@@ -383,7 +384,17 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
                 if aux_answer == n:
                     final_result.append([answer, clustering_punctuation[i][1], i])
 
+    clustering_punctuation = sorted(clustering_punctuation, key=lambda answer: answer[1], reverse=True)
+    #print clustering_punctuation
+    #print final_result
 
+    final_result_group_by_cluster = []
+    for i in clustering_punctuation:
+        cluster_n = i[0]
+        for result in final_result:
+            if result[2] == cluster_n:
+                final_result_group_by_cluster.append(result)
+    print final_result_group_by_cluster
 
     final_result = sorted(final_result, key=lambda answer: answer[1], reverse=True)
 
@@ -401,12 +412,12 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
     print "Tiempo de ejecucion: " , total_time
     print
     print
-    return [final_result, best_of_cluster]
+    return [final_result, final_result_group_by_cluster, best_of_cluster]
 
 
 if __name__=='__main__':
     db = dbc.connection()
-    question_id = 40480
+    question_id = 950087
     answers = dbc.question_answer_find_by_questionId(question_id, db)['answers']
     question_body = dbc.question_answer_find_by_questionId(question_id, db)['question_body']
     question_title = dbc.question_answer_find_by_questionId(question_id, db)['question_title']
@@ -445,15 +456,18 @@ if __name__=='__main__':
         print
     '''****** K means analysis ******'''
     print "****** K means analysis ******"
-    K_means_clustering_result = K_means_clustering(question_body, question_title, answers, 5)
+    K_means_clustering_result = K_means_clustering(question_body, question_title, answers, 4)
     print "Resultado general en bruto"
     print K_means_clustering_result
     print
     print "Resultado clasificacion de respuestas de forma global (primer valor del resultado de la ejecucion de 'K_means_clustering'"
     print K_means_clustering_result[0]
     print
-    print "Resultado clasificacion de respuestas estimada (segundo valor del resultado de la ejecucion de 'K_means_clustering'"
+    print "Resultado clasificacion por clusteres (segundo valor del resultado de la ejecucion de 'K_means_clustering'"
     print K_means_clustering_result[1]
+    print
+    print "Resultado clasificacion de respuestas estimada (tercer valor del resultado de la ejecucion de 'K_means_clustering'"
+    print K_means_clustering_result[2]
 
 
 
