@@ -6,12 +6,15 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'TFG.views.home', name='home'),
-    # url(r'^TFG/', include('TFG.foo.urls')),
+    #url(r'^$', 'TFG.views.home', name='home'),
+    #url(r'^TFG/', include('TFG.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
+
+    #Home
+    url(r'^$', 'principal.views.main_view', name='Inicio'),
 )
