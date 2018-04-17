@@ -60,7 +60,33 @@ def question_answer_find_by_questionId(question_id, db_connection):
     return question
 
 
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+find_all_api_data(db_connection)
+
+** Descripcion del metodo **
+Devuelve los documentos contenidos en la coleccion 'api_data'
+
+** Descripcion de parametros **
+db_connection: conexion con la base de datos
+
+**Return**
+lista con los documentos
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def find_all_api_data(db_connection):
+    db = db_connection
+    collection = db['api_data']
+    cursor = collection.find({})
+    result = []
+    for document in cursor:
+        result.append(document)
+    return result
+
 if __name__=='__main__':
     db = connection()
-    print api_data_find_by_questionId(950087, db)
-    print question_answer_find_by_questionId(950087, db)
+    #print api_data_find_by_questionId(950087, db)
+    #print question_answer_find_by_questionId(950087, db)
+    api_data = find_all_api_data(db)
+    print api_data
+

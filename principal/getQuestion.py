@@ -103,12 +103,13 @@ question_id: identificador de la pregunta
 None
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-def generate_question_json(url, question_id):
+def generate_question_json(url, question_id, path = 'principal/question.json'):
     r = get_question(url, question_id)
-    with open('question.json', 'w') as outfile:
+    with open(path, 'w') as outfile:
         json.dump(r, outfile)
 
 
 if __name__ == '__main__':
     get_question("https://stackoverflow.com/questions/950087/how-do-i-include-a-javascript-file-in-another-javascript-file", 950087)
-    generate_question_json("https://stackoverflow.com/questions/950087/how-do-i-include-a-javascript-file-in-another-javascript-file", 950087)
+    generate_question_json("https://stackoverflow.com/questions/950087/how-do-i-include-a-javascript-file-in-another-javascript-file", 950087
+                           , path="question.json")

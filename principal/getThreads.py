@@ -212,12 +212,12 @@ def get_threads(page = None, page_size = None, from_date = None, to_date = None,
     r = requests.get(url)
     parse =  r.json()
     #print parse
-    with open('raw_api_data.json', 'w') as outfile:
+    with open('principal/raw_api_data.json', 'w') as outfile:
         json.dump(parse, outfile)
 
 
     #Devuelve los links de los hilos leidos del documento
-    filename = "raw_api_data.json"
+    filename = "principal/raw_api_data.json"
     items_info = []
     with open(filename, 'r') as f:
         objects = ijson.items(f, 'items')

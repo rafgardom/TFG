@@ -51,8 +51,9 @@ def get_answer(url, question_id, answer_list=None, recursive = False):
         answer_body = get_html_text(raw_answer_body)
         raw_comments = raw_answer.find('ul', attrs={'class': 'comments-list js-comments-list'})
 
-        if len(raw_comments.get_text()) > 1:
-            answer_comments = [get_html_text(ac) for ac in raw_comments.find_all('div', attrs={'class':'comment-body'})]
+        if raw_comments:
+            if len(raw_comments.get_text()) > 1:
+                answer_comments = [get_html_text(ac) for ac in raw_comments.find_all('div', attrs={'class':'comment-body'})]
 
         answer_dict = {'answer_body':answer_body, 'answer_comments': answer_comments, 'answer_votes':answer_votes, 'question_id' : question_id}
 

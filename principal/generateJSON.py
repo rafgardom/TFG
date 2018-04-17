@@ -13,12 +13,12 @@ la de las respuestas.
 None
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-def generate_question_answer_json(url, question_id):
+def generate_question_answer_json(url, question_id, path = "principal/question_answer.json"):
     question_answer_dic = getQuestion.get_question(url, question_id)
     answer_dic = getAnswer.get_answer(url, question_id)
     question_answer_dic['answers'] = answer_dic
 
-    with open('question_answer.json', 'w') as outfile:
+    with open(path, 'w') as outfile:
         json.dump(question_answer_dic, outfile)
 
 
@@ -61,12 +61,13 @@ None
 '''
 def generate_processed_api_data_json(page = None, page_size = None, from_date = None, to_date = None, order = "desc", sort = "activity",
                            q = None, accepted = None, answers = None, body = None, closed = None, notice = None,
-                           not_tagged = None, tagged = None, title = None, user = None, url = None, views = None, wiki = None):
+                           not_tagged = None, tagged = None, title = None, user = None, url = None, views = None, wiki = None,
+                                     path = "principal/api_data.json"):
 
     dic = getThreads.get_threads(page, page_size, from_date, to_date, order, sort, q, accepted, answers, body, closed, notice,
                            not_tagged, tagged, title, user, url, views, wiki)
 
-    with open('api_data.json', 'w') as outfile:
+    with open(path, 'w') as outfile:
         json.dump(dic, outfile)
 
 
@@ -76,7 +77,7 @@ if __name__ == '__main__':
     #generate_processed_api_data_json(answers=40)
     '''generate_question_answer_json(
         "https://stackoverflow.com/questions/950087/how-do-i-include-a-javascript-file-in-another-javascript-file",
-        950087)'''
+        950087, path = "api_data.json")'''
     generate_question_answer_json(
         "https://stackoverflow.com/questions/17421104/android-studio-marks-r-in-red-with-error-message-cannot-resolve-symbol-r-but",
-        17421104)
+        17421104, path = "question_answer.json")

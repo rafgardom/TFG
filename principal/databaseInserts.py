@@ -25,6 +25,24 @@ def insert_question_answer(document, db_connection):
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+drop_question_answer(db_connection)
+
+** Descripcion del metodo **
+Elimina los documentos de la coleccion "question_answer"
+
+** Descripcion de parametros **
+db_connection: conexion con la base de datos
+
+**Return**
+None
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def drop_question_answer(db_connection):
+    db_connection.question_answer.drop()
+
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 insert_api_data(document)
 
 ** Descripcion del metodo **
@@ -47,6 +65,25 @@ def insert_api_data(document, db_connection):
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+drop_api_data(db_connection)
+
+** Descripcion del metodo **
+Elimina los documentos de la coleccion "api_data"
+
+** Descripcion de parametros **
+db_connection: conexion con la base de datos
+
+**Return**
+None
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def drop_api_data(db_connection):
+    db_connection.api_data.drop()
+
+
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 insert_raw_api_data(document)
 
 ** Descripcion del metodo **
@@ -65,6 +102,26 @@ def insert_raw_api_data(document, db_connection):
     parsed = json.loads(document.read())
     collection = db_connection.raw_api_data
     collection.insert(parsed)
+
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+drop_api_data(db_connection)
+
+** Descripcion del metodo **
+Elimina los documentos de la coleccion "raw_api_data"
+
+** Descripcion de parametros **
+db_connection: conexion con la base de datos
+
+**Return**
+None
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def drop_raw_api_data(db_connection):
+    db_connection.raw_api_data.drop()
+
+
 
 
 '''
