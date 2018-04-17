@@ -14,10 +14,10 @@ class api_search_form(forms.Form):
 
                                 }), label='Desde')
 
-    fecha_fin = forms.DateField(required=False, widget=forms.TextInput(attrs=
-    {
-        'class': 'datepicker'
-    }), label='Hasta')
+    fecha_fin = forms.DateTimeField(required=False, widget=forms.TextInput(attrs=
+                                {
+                                    'class': 'datepicker'
+                                }), label='Hasta')
     sort = forms.ModelChoiceField(required=False, queryset=Sort.objects.all(), label="Orden por parámetros")
     q = forms.CharField(required=False, max_length=50, label='Texto libre')
     answers = forms.IntegerField(required = False, label='Número de respuestas')
