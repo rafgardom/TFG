@@ -75,14 +75,14 @@ def main_view(request):
                 dbi.insert_question_answer(question_answer, db_connection)
                 question_answer = dbc.question_answer_find_by_questionId(document['question_id'],db_connection)
                 result_list.append([document, question_answer])
-                if len(result_list) == 2:
-                    break
+                '''if len(result_list) == 2:
+                    break'''
 
-            '''TODO ahora habria que devolver y pintar en pantalla los hilos de question_answer ya almacenados en BD para
-            que el usuario elija cual quiere analizar
-            '''
 
     else:
         formulario = forms.api_search_form()
 
     return render_to_response('home.html',{'formulario':formulario, 'result_list':result_list, 'begin':0}, context_instance=RequestContext(request))
+
+def analyze_thread(request, id):
+    print id

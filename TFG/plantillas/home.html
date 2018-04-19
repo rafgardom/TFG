@@ -35,6 +35,7 @@
                 <th>Número de respuestas</th>
                 <th>Etiquetas</th>
                 <th>Cuerpo</th>
+                <th>Selección de hilo</th>
               </tr>
             </thead>
             <tbody>
@@ -70,7 +71,12 @@
                                   </div>
                                 </div>
                         </td>
+                        <td><a href ={% url selected_thread row.0.question_id  %} class='btn btn-primary'>
+                                    Seleccionar
+                            </a>
+                        </td>
                       </tr>
+
 
 
                   {% endfor %}
