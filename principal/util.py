@@ -424,6 +424,8 @@ if __name__=='__main__':
     question_code = dbc.question_answer_find_by_questionId(question_id, db)['question_code']
 
     processed_question_code = question_code_processing(question_code)
+    gensim_similarity_tf_idf_code_result = None
+    nltk_title_analyze_code_result = None
 
     print "***Analisis por similaridad con distancia tf-idf respecto al cuerpo de la pregunta***"
     gensim_similarity_tf_idf_body_result = gensim_similarity_tf_idf(answers, question_body)

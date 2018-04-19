@@ -1,4 +1,6 @@
 {% extends 'main.html' %}
+{% load mathfilters %}
+{% load jsonify %}
 
 {% block titulo_apartado %}
   <div class="page-header">
@@ -10,12 +12,73 @@
   </div> {% endblock %}
 
 {% block contenido %}
-    <form id="formulario" method ="post" enctype="multipart/form-data" action="">{% csrf_token %}
-        <table>
-            {{formulario}}
-        </table>
-        <br/>
-        <p><input type="submit" value="Buscar hilos!"></p>
-    </form>
+    <div>
+        <form id="formulario" method ="post" enctype="multipart/form-data" action="">{% csrf_token %}
+            <table>
+                {{formulario}}
+            </table>
+            <br/>
+            <p><input type="submit" value="Buscar hilos!"></p>
+        </form>
+    </div>
+
+    <br/>
+    <br/>
+    {% if result_list %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Link (Url)</th>
+                <th>Título</th>
+                <th>Número de respuestas</th>
+                <th>Etiquetas</th>
+                <th>Cuerpo</th>
+              </tr>
+            </thead>
+            <tbody>
+
+                  {% for row in result_list%}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><a href="{{row.0.link}}">{{row.0.link}}</a></td>
+                        <td>{{row.1.question_title}}</td>
+                        <td>{{row.0.answer_count}}</td>
+                        <td>{{row.0.tags|jsonify}}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalLong{{ forloop.counter }}">
+                                  Ver
+                            </button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="modalLong{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="modalLongTitle" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="modalLongTitle">Cuerpo de la pregunta:</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                        {{ row.1.question_body }}
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                        </td>
+                      </tr>
+
+
+                  {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+    {% endif %}
+    {{ result_list.0.0.tags }}
 
 {% endblock %}
