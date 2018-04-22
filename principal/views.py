@@ -6,6 +6,7 @@ import time
 import databaseConnection as dbc
 import databaseInserts as dbi
 import generateJSON as gJSON
+import util as util
 
 
 import generateJSON as gJson
@@ -78,11 +79,30 @@ def main_view(request):
                 '''if len(result_list) == 2:
                     break'''
 
-
     else:
         formulario = forms.api_search_form()
 
     return render_to_response('home.html',{'formulario':formulario, 'result_list':result_list, 'begin':0}, context_instance=RequestContext(request))
 
 def analyze_thread(request, id):
-    print id
+    db = dbc.connection()
+    question_id = id
+
+    answers = dbc.question_answer_find_by_questionId(id, db)['answers']
+    question_body = dbc.question_answer_find_by_questionId(question_id, db)['question_body']
+    question_title = dbc.question_answer_find_by_questionId(question_id, db)['question_title']
+    question_code = dbc.question_answer_find_by_questionId(question_id, db)['question_code']
+
+    processed_question_code = util.question_code_processing(question_code)
+    gensim_similarity_tf_idf_code_result = None
+    nltk_title_analyze_code_result = None
+
+    #Resultados de los analisis:
+    gensim_similarity_tf_idf_body_result = util.gensim_similarity_tf_idf(answers, question_body)
+
+    if processed_question_code:
+        gensim_similarity_tf_idf_code_result = util.gensim_similarity_tf_idf(answers, processed_question_code)
+
+    return render_to_response('actual_results.html', {'answers': answers, 'gensim_similarity_tf_idf_body_result':gensim_similarity_tf_idf_body_result,
+                                                      'gensim_similarity_tf_idf_code_result':gensim_similarity_tf_idf_code_result},
+                              context_instance=RequestContext(request))

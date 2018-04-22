@@ -154,7 +154,7 @@ def gensim_similarity_tf_idf(answers, question, raw = True):
         '''Ordenamos las respuestas segun su indice de similaridad respecto a la pregunta'''
         sorted_similarity_answers = sorted(indexed_similarity_list, key=lambda answer: answer[1], reverse=True)
         print "Similaridad de las respuestas en base a la pregunta:"
-        print sorted_similarity_answers
+        #print sorted_similarity_answers
 
         '''Ahora devolvemos las respuestas segun su orden de aparicion'''
         for i in sorted_similarity_answers:
@@ -417,7 +417,8 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
 
 if __name__=='__main__':
     db = dbc.connection()
-    question_id = 950087
+    question_id = 5717093
+
     answers = dbc.question_answer_find_by_questionId(question_id, db)['answers']
     question_body = dbc.question_answer_find_by_questionId(question_id, db)['question_body']
     question_title = dbc.question_answer_find_by_questionId(question_id, db)['question_title']
