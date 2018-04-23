@@ -86,9 +86,9 @@ def main_view(request):
 
 def analyze_thread(request, id):
     db = dbc.connection()
-    question_id = id
+    question_id = int(id)
 
-    answers = dbc.question_answer_find_by_questionId(id, db)['answers']
+    answers = dbc.question_answer_find_by_questionId(question_id, db)['answers']
     question_body = dbc.question_answer_find_by_questionId(question_id, db)['question_body']
     question_title = dbc.question_answer_find_by_questionId(question_id, db)['question_title']
     question_code = dbc.question_answer_find_by_questionId(question_id, db)['question_code']

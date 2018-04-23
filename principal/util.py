@@ -153,7 +153,7 @@ def gensim_similarity_tf_idf(answers, question, raw = True):
 
         '''Ordenamos las respuestas segun su indice de similaridad respecto a la pregunta'''
         sorted_similarity_answers = sorted(indexed_similarity_list, key=lambda answer: answer[1], reverse=True)
-        print "Similaridad de las respuestas en base a la pregunta:"
+        #print "Similaridad de las respuestas en base a la pregunta:"
         #print sorted_similarity_answers
 
         '''Ahora devolvemos las respuestas segun su orden de aparicion'''
@@ -217,8 +217,8 @@ def nltk_title_analyze(question, answers):
             index = answers.index(i[0])
             index_processed_list.append([index, i[1]])
 
-        print "Posicion de los resultados vs puntuacion:"
-        print index_processed_list
+        #print "Posicion de los resultados vs puntuacion:"
+        #print index_processed_list
         return freq_dist_puntuation_list
     else:
         print"El elemento de la pregunta que ha pasado como parametro es nulo"
@@ -335,13 +335,13 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
     answer_model = KMeans(n_clusters=cluster_number, init='k-means++', max_iter=100, n_init=1)
     answer_model.fit(vectoriced_answers_document)
 
-    print("Terminos tomados en los clusteres:")
+    #print("Terminos tomados en los clusteres:")
 
     '''question_order_centroids = question_model.cluster_centers_.argsort()[:, ::-1]
     question_terms = tfidf_question_vectorizer.get_feature_names()'''
 
     answer_terms = tfidf_answer_vectorizer.get_feature_names()
-    print answer_terms
+    #print answer_terms
 
 
     clusters = answer_model.labels_.tolist()
@@ -349,8 +349,8 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
     answer_data = {'answers': answers_document, 'cluster': clusters}
     frame = pd.DataFrame(answer_data, index=[clusters], columns=['answers', 'cluster'])
 
-    print "Clasificacion de respuestas en clusteres:"
-    print frame
+    #print "Clasificacion de respuestas en clusteres:"
+    #print frame
 
     clustered_answers_dict = {}
     for i in range(cluster_number):
@@ -362,7 +362,7 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
     #print frame.ix[0].get_values()[0][0]
     #print clustered_answers_dict[4]
     clustering_punctuation = []
-    print "Calculo de similaridad de la pregunta con cada cluster"
+    #print "Calculo de similaridad de la pregunta con cada cluster"
     for i in range(cluster_number):
         clustered_processed_answers = clustered_answers_dict[i]
         answer_set = [tokenize_text(answer.decode("utf-8", "ignore")) for answer in clustered_processed_answers]
@@ -394,7 +394,7 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
         for result in final_result:
             if result[2] == cluster_n:
                 final_result_group_by_cluster.append(result)
-    print final_result_group_by_cluster
+    #print final_result_group_by_cluster
 
     final_result = sorted(final_result, key=lambda answer: answer[1], reverse=True)
 
@@ -409,9 +409,9 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
 
     end_time = time.time()
     total_time = end_time - start_time
-    print "Tiempo de ejecucion: " , total_time
-    print
-    print
+    #print "Tiempo de ejecucion: " , total_time
+    #print
+    #print
     return [final_result, final_result_group_by_cluster, best_of_cluster]
 
 

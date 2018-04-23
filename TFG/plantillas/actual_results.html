@@ -14,9 +14,131 @@
 {% block contenido %}
     <div class="row">
       <div class="col-md-4">Ordenación de respuestas según la comunidad
+          <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Votos</th>
+                <th>Cuerpo</th>
+              </tr>
+            </thead>
+            <tbody>
+                  {% for answer in answers%}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{answer.answer_votes}}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#answerModal{{ forloop.counter }}">{{ answer.answer_body|truncatewords:5 }}</button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="answerModal{{ forloop.counter }}" role="dialog">
+                                    <div class="modal-dialog modal-lg">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                          <h4 class="modal-title">Modal Header</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                          <p>{{ answer.answer_body }}</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                        </td>
+                      </tr>
+                  {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="col-md-4">.col-md-1</div>
-      <div class="col-md-1">.col-md-1</div>
+      <div class="col-md-4"> Analisis por similaridad con distancia tf-idf respecto al cuerpo de la pregunta
+          <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Votos</th>
+                <th>Cuerpo</th>
+              </tr>
+            </thead>
+            <tbody>
+                  {% for gensim_body_tf_idf in gensim_similarity_tf_idf_body_result%}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{gensim_body_tf_idf.0.answer_votes}}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#gensim_body_tf_idfModal{{ forloop.counter }}">{{ gensim_body_tf_idf.0.answer_body|truncatewords:5 }}</button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="gensim_body_tf_idfModal{{ forloop.counter }}" role="dialog">
+                                    <div class="modal-dialog modal-lg">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                          <h4 class="modal-title">Modal Header</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                          <p>{{ gensim_body_tf_idf.0.answer_body }}</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                        </td>
+                      </tr>
+                  {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% if gensim_similarity_tf_idf_code_result %}
+        <div class="col-md-4">Analisis por similaridad con distancia tf-idf respecto al codigo de la pregunta
+            <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Votos</th>
+                <th>Cuerpo</th>
+              </tr>
+            </thead>
+            <tbody>
+                  {% for gensim_code_tf_idf in gensim_similarity_tf_idf_code_result%}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{gensim_code_tf_idf.0.answer_votes}}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#gensim_code_tf_idfModal{{ forloop.counter }}">{{ gensim_code_tf_idf.0.answer_body|truncatewords:5 }}</button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="gensim_code_tf_idfModal{{ forloop.counter }}" role="dialog">
+                                    <div class="modal-dialog modal-lg">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                          <h4 class="modal-title">Modal Header</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                          <p>{{ gensim_code_tf_idf.0.answer_body }}</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                        </td>
+                      </tr>
+                  {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+
       <div class="col-md-1">.col-md-1</div>
       <div class="col-md-1">.col-md-1</div>
 
