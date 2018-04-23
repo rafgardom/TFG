@@ -96,6 +96,7 @@ def analyze_thread(request, id):
     processed_question_code = util.question_code_processing(question_code)
     gensim_similarity_tf_idf_code_result = None
     nltk_title_analyze_code_result = None
+    merge_gensim_nltk_code = None
 
     #Resultados de los analisis:
     gensim_similarity_tf_idf_body_result = util.gensim_similarity_tf_idf(answers, question_body)
@@ -103,6 +104,23 @@ def analyze_thread(request, id):
     if processed_question_code:
         gensim_similarity_tf_idf_code_result = util.gensim_similarity_tf_idf(answers, processed_question_code)
 
+    nltk_title_analyze_title_result = util.nltk_title_analyze(question_title, answers)
+
+    if processed_question_code:
+        nltk_title_analyze_code_result = util.nltk_title_analyze(processed_question_code, answers)
+
+    merge_gensim_nltk_title = util.merge_results(gensim_similarity_tf_idf_body_result, nltk_title_analyze_title_result, answers)
+
+    if processed_question_code:
+        merge_gensim_nltk_code = util.merge_results(gensim_similarity_tf_idf_code_result, nltk_title_analyze_code_result, answers)
+
+    K_means_clustering_result = util.K_means_clustering(question_body, question_title, answers, 5)
+
     return render_to_response('actual_results.html', {'answers': answers, 'gensim_similarity_tf_idf_body_result':gensim_similarity_tf_idf_body_result,
-                                                      'gensim_similarity_tf_idf_code_result':gensim_similarity_tf_idf_code_result},
+                                                      'gensim_similarity_tf_idf_code_result':gensim_similarity_tf_idf_code_result,
+                                                      'nltk_title_analyze_title_result':nltk_title_analyze_title_result,
+                                                      'nltk_title_analyze_code_result':nltk_title_analyze_code_result,
+                                                      'merge_gensim_nltk_title':merge_gensim_nltk_title,
+                                                      'merge_gensim_nltk_code':merge_gensim_nltk_code,
+                                                      'K_means_clustering_result':K_means_clustering_result},
                               context_instance=RequestContext(request))

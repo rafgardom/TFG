@@ -396,7 +396,7 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
                 final_result_group_by_cluster.append(result)
     #print final_result_group_by_cluster
 
-    final_result = sorted(final_result, key=lambda answer: answer[1], reverse=True)
+        final_result_group_by_cluster = sorted(final_result_group_by_cluster, key=lambda answer: answer[1], reverse=True)
 
     best_of_cluster = []
     for cluster in range(cluster_number):
@@ -417,7 +417,7 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
 
 if __name__=='__main__':
     db = dbc.connection()
-    question_id = 5717093
+    question_id = 16969060
 
     answers = dbc.question_answer_find_by_questionId(question_id, db)['answers']
     question_body = dbc.question_answer_find_by_questionId(question_id, db)['question_body']
