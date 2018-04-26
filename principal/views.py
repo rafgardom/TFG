@@ -127,10 +127,12 @@ def analyze_thread(request, id):
         elif len(question['answers']) >= 5:
             K_means_clustering_result = util.K_means_clustering(question_body, question_title, answers,5)
 
+    question_prepared_dic = {'question_title':question_title, 'question_body':question_body, 'question_code':question_code}
+
     genJSON.generate_results_json(answers, gensim_similarity_tf_idf_body_result,
                                   gensim_similarity_tf_idf_code_result, nltk_title_analyze_title_result,
                                   nltk_title_analyze_code_result, merge_gensim_nltk_title, merge_gensim_nltk_code,
-                                  K_means_clustering_result, question_id)
+                                  K_means_clustering_result, question_id, question_prepared_dic)
 
     results = open("principal/results.json", 'r')
     dbi.insert_results(results, db)
@@ -145,3 +147,35 @@ def analyze_thread(request, id):
                                                       'question_id':question_id,
                                                       'question_link':question_link},
                               context_instance=RequestContext(request))
+
+
+def results_list(request):
+    db = dbc.connection()
+    results = dbc.find_all_results(db)
+
+    return render_to_response('results.html', {'results': results},
+                              context_instance=RequestContext(request))
+
+def view_result(request, id):
+    db = dbc.connection()
+    question_id = int(id)
+    result = dbc.results_by_questionId(question_id, db)
+
+    answers = result['answers']
+    gensim_similarity_tf_idf_body_result = result['gensim_similarity_tf_idf_body_result']
+    gensim_similarity_tf_idf_code_result = result['gensim_similarity_tf_idf_code_result']
+    nltk_title_analyze_title_result = result['nltk_title_analyze_title_result']
+    nltk_title_analyze_code_result = result['nltk_title_analyze_code_result']
+    merge_gensim_nltk_title = result['merge_gensim_nltk_title']
+    merge_gensim_nltk_code = result['merge_gensim_nltk_code']
+    K_means_clustering_result = result['K_means_clustering_result']
+
+    return render_to_response('results.html', {'old_result': True, 'answers': answers,
+                                               'gensim_similarity_tf_idf_body_result':gensim_similarity_tf_idf_body_result,
+                                                'gensim_similarity_tf_idf_code_result':gensim_similarity_tf_idf_code_result,
+                                                'nltk_title_analyze_title_result':nltk_title_analyze_title_result,
+                                                'nltk_title_analyze_code_result':nltk_title_analyze_code_result,
+                                                'merge_gensim_nltk_title':merge_gensim_nltk_title,
+                                                'merge_gensim_nltk_code':merge_gensim_nltk_code,
+                                                'K_means_clustering_result':K_means_clustering_result,
+                                                'question_id':question_id}, context_instance=RequestContext(request))

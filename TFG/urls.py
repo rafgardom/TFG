@@ -18,7 +18,12 @@ urlpatterns = patterns('',
     #Home
     url(r'^$', 'principal.views.main_view', name='Inicio'),
 
-    #Select sport global
+    #Select thread
     url(r'^selected_thread/(?P<id>\d+)/$', 'principal.views.analyze_thread', name="selected_thread"),
 
+    #Results_list
+    url(r'^last-results/', 'principal.views.results_list', name='last-results'),
+
+    #Select old result
+    url(r'^selected_result/(?P<id>\d+)/$', 'principal.views.view_result', name="selected_result"),
 )

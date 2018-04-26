@@ -87,11 +87,11 @@ None
 def generate_results_json(answers, gensim_similarity_tf_idf_body_result,
                                   gensim_similarity_tf_idf_code_result, nltk_title_analyze_title_result,
                                   nltk_title_analyze_code_result, merge_gensim_nltk_title, merge_gensim_nltk_code,
-                                  K_means_clustering_result, question_id, path = "principal/results.json"):
+                                  K_means_clustering_result, question_id, question, path = "principal/results.json"):
 
     time_now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 
-    result_dic = {'answers':answers, 'question_id': question_id,
+    result_dic = {'answers':answers, 'question_id': question_id, 'question':question,
                   'gensim_similarity_tf_idf_body_result':gensim_similarity_tf_idf_body_result,
                   'gensim_similarity_tf_idf_code_result':gensim_similarity_tf_idf_code_result,
                   'nltk_title_analyze_title_result':nltk_title_analyze_title_result,

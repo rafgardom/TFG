@@ -80,6 +80,30 @@ def results_by_questionId(question_id, db_connection):
     results = db.results.find_one({'question_id': question_id})
     return results
 
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+find_all_api_data(db_connection)
+
+** Descripcion del metodo **
+Devuelve los documentos contenidos en la coleccion 'results'
+
+** Descripcion de parametros **
+db_connection: conexion con la base de datos
+
+**Return**
+lista con los documentos
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def find_all_results(db_connection):
+    db = db_connection
+    collection = db['results']
+    cursor = collection.find({})
+    result = []
+    for document in cursor:
+        result.append(document)
+    return result
+
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 find_all_api_data(db_connection)

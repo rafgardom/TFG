@@ -1,0 +1,615 @@
+{% extends 'main.html' %}
+{% load mathfilters %}
+{% load jsonify %}
+
+{% block titulo_apartado %}
+<style>
+.table caption{
+    border:1px solid #709bff;
+    background-color: #c4d4ff;
+    display: table-caption;
+    text-align: center;
+    font-size: 110%;
+    font-weight: bold;
+    font-style: italic;
+    font-kerning: auto;
+    font-family: inherit;
+    color:black;
+}
+
+.wrapper {
+    text-align: center;
+}
+
+.ppal_button{
+    text-align: center;
+}
+
+.link_button{
+    text-align: center;
+}
+
+.btn {
+    position: center;
+    margin-left:10px;
+}
+
+.row{
+    margin-left: 5px;
+}
+.modal-body{
+    text-indent: 3%;
+}
+</style>
+  <div class="page-header">
+      <h1>Histórico de resultados:
+          <small>
+              revisión de rankings ya calculados
+          </small>
+      </h1>
+  </div> {% endblock %}
+
+{% block contenido %}
+
+    {% if results %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Título</th>
+                <th>Cuerpo</th>
+                <th>Código</th>
+                <th>Fecha</th>
+                <th>Selección de hilo</th>
+              </tr>
+            </thead>
+            <tbody>
+
+                  {% for row in results%}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{row.question.question_title}}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalBody{{ forloop.counter }}">
+                                  Ver
+                            </button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="modalBody{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="modalLongTitle" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="modalLongTitle">Cuerpo de la pregunta:</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                        {{ row.question.question_body }}
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                        </td>
+                          {% if row.question.question_code %}
+                          <td>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalCodeLong{{ forloop.counter }}">
+                                  Ver
+                            </button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="modalCodeLong{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="modalLongTitle" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="modalLongTitle">Código de la pregunta:</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                          <pre>{{ row.question.question_code|jsonify }}</pre>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                        </td>
+                          {% endif %}
+                      {% if not row.question.question_code %}
+                          <td>
+                          No hay código
+                          </td>
+                      {% endif %}
+                        <td>{{row.time_now}}</td>
+                        <td>
+                            <a href ="{% url selected_result row.question_id  %}" class='btn btn-primary target="_blank"'>
+                                    Visualizar resultados
+                            </a>
+                        </td>
+                      </tr>
+                  {% endfor %}
+            </tbody>
+          </table>
+        </div>
+    {% endif %}
+    {% if old_result %}
+
+        <div class="wrapper ppal_button">
+            <button id="gensim_button" type="button" class="btn btn-success">Visualizar/Ocultar resultados gensim</button>
+            <button id="nltk_button" type="button" class="btn btn-success">Visualizar/Ocultar resultados nltk</button>
+            <button id="merge_button" type="button" class="btn btn-success">Visualizar/Ocultar resultados similaridad (gensim) + nltk</button>
+            <button id="kmeans_button" type="button" class="btn btn-success">Visualizar/Ocultar resultados Kmeans(Clustering)</button>
+        </div>
+        <br/>
+        <br/>
+        <div class="row">
+          <div class="col-md-6">
+          <div class="table-responsive">
+              <table class="table text-light">
+              <caption class="text-light">Ordenación de respuestas según la comunidad</caption>
+                <thead>
+                  <tr class="info">
+                    <th>#</th>
+                    <th>Votos</th>
+                    <th>Cuerpo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                      {% for answer in answers%}
+                          <tr class="info">
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{answer.answer_votes}}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#answerModal{{ forloop.counter }}">{{ answer.answer_body|truncatewords:5 }}</button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="answerModal{{ forloop.counter }}" role="dialog">
+                                        <div class="modal-dialog modal-lg">
+                                          <div class="modal-content">
+                                            <div class="modal-header">
+                                              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                              <h4 class="modal-title">Cuerpo:</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                              <p>{{ answer.answer_body }}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                            </td>
+                          </tr>
+                      {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-md-6" id="gensim_div1">
+              <div class="table-responsive">
+              <table class="table">
+                <caption>Análisis por similaridad con distancia tf-idf respecto al cuerpo de la pregunta</caption>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Votos</th>
+                    <th>Cuerpo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                      {% for gensim_body_tf_idf in gensim_similarity_tf_idf_body_result%}
+                          <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{gensim_body_tf_idf.0.answer_votes}}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#gensim_body_tf_idfModal{{ forloop.counter }}">{{ gensim_body_tf_idf.0.answer_body|truncatewords:5 }}</button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="gensim_body_tf_idfModal{{ forloop.counter }}" role="dialog">
+                                        <div class="modal-dialog modal-lg">
+                                          <div class="modal-content">
+                                            <div class="modal-header">
+                                              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                              <h4 class="modal-title">Cuerpo:</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                              <p>{{ gensim_body_tf_idf.0.answer_body }}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                            </td>
+                          </tr>
+                      {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        {% if gensim_similarity_tf_idf_code_result %}
+            <div class="col-md-6" id="gensim_div2">
+                <div class="table-responsive">
+              <table class="table">
+                <caption>Análisis por similaridad con distancia tf-idf respecto al código de la pregunta</caption>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Votos</th>
+                    <th>Cuerpo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                      {% for gensim_code_tf_idf in gensim_similarity_tf_idf_code_result%}
+                          <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{gensim_code_tf_idf.0.answer_votes}}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#gensim_code_tf_idfModal{{ forloop.counter }}">{{ gensim_code_tf_idf.0.answer_body|truncatewords:5 }}</button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="gensim_code_tf_idfModal{{ forloop.counter }}" role="dialog">
+                                        <div class="modal-dialog modal-lg">
+                                          <div class="modal-content">
+                                            <div class="modal-header">
+                                              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                              <h4 class="modal-title">Cuerpo:</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                              <p>{{ gensim_code_tf_idf.0.answer_body }}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                            </td>
+                          </tr>
+                      {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        {% endif %}
+
+          <div class="col-md-6" id="nltk_div1">
+              <div class="table-responsive">
+              <table class="table">
+                <caption>Análisis por frecuencia de aparición de palabras del título de la pregunta</caption>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Votos</th>
+                    <th>Cuerpo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                      {% for nltk_title in nltk_title_analyze_title_result%}
+                          <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{nltk_title.0.answer_votes}}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#nltk_titleModal{{ forloop.counter }}">{{ nltk_title.0.answer_body|truncatewords:5 }}</button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="nltk_titleModal{{ forloop.counter }}" role="dialog">
+                                        <div class="modal-dialog modal-lg">
+                                          <div class="modal-content">
+                                            <div class="modal-header">
+                                              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                              <h4 class="modal-title">Cuerpo:</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                              <p>{{ nltk_title.0.answer_body }}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                            </td>
+                          </tr>
+                      {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        {% if nltk_title_analyze_code_result%}
+            <div class="col-md-6" id="nltk_div2">
+              <div class="table-responsive">
+              <table class="table">
+                <caption>Análisis por frecuencia de aparición de palabras del código de la pregunta</caption>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Votos</th>
+                    <th>Cuerpo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                      {% for nltk_code in nltk_title_analyze_code_result%}
+                          <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{nltk_code.0.answer_votes}}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#nltk_codeModal{{ forloop.counter }}">{{ nltk_code.0.answer_body|truncatewords:5 }}</button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="nltk_codeModal{{ forloop.counter }}" role="dialog">
+                                        <div class="modal-dialog modal-lg">
+                                          <div class="modal-content">
+                                            <div class="modal-header">
+                                              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                              <h4 class="modal-title">Cuerpo:</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                              <p>{{ nltk_code.0.answer_body }}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                            </td>
+                          </tr>
+                      {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="col-md-6" id="merge_div1">
+          <div class="table-responsive">
+          <table class="table">
+            <caption>Clasificación agrupando los resultados de cuerpo y título de la pregunta</caption>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Votos</th>
+                <th>Cuerpo</th>
+              </tr>
+            </thead>
+            <tbody>
+                  {% for merge_gensim_nltk_t in merge_gensim_nltk_title%}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{merge_gensim_nltk_t.0.answer_votes}}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#merge_gensim_nltk_tModal{{ forloop.counter }}">{{ merge_gensim_nltk_t.0.answer_body|truncatewords:5 }}</button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="merge_gensim_nltk_tModal{{ forloop.counter }}" role="dialog">
+                                    <div class="modal-dialog modal-lg">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                          <h4 class="modal-title">Cuerpo:</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                          <p>{{ merge_gensim_nltk_t.0.answer_body }}</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                        </td>
+                      </tr>
+                  {% endfor %}
+                 </tbody>
+             </table>
+            </div>
+        </div>
+
+        {% if merge_gensim_nltk_code%}
+            <div class="col-md-6" id="merge_div2">
+              <div class="table-responsive">
+              <table class="table">
+                <caption>Clasificación agrupando los resultados del código de la pregunta</caption>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Votos</th>
+                    <th>Cuerpo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                      {% for merge_gensim_nltk_c in merge_gensim_nltk_code%}
+                          <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{merge_gensim_nltk_c.0.answer_votes}}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#merge_gensim_nltk_cModal{{ forloop.counter }}">{{ merge_gensim_nltk_c.0.answer_body|truncatewords:5 }}</button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="merge_gensim_nltk_cModal{{ forloop.counter }}" role="dialog">
+                                        <div class="modal-dialog modal-lg">
+                                          <div class="modal-content">
+                                            <div class="modal-header">
+                                              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                              <h4 class="modal-title">Cuerpo:</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                              <p>{{ merge_gensim_nltk_c.0.answer_body }}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                            </td>
+                          </tr>
+                      {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        {% endif %}
+        {% if K_means_clustering_result %}
+            <div class="col-md-6" id="kmeans_div1">
+              <div class="table-responsive">
+              <table class="table">
+                <caption>Resultado clasificación de respuestas de forma global</caption>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Votos</th>
+                    <th>Cuerpo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                      {% for k_means_one in K_means_clustering_result.0%}
+                          <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{k_means_one.0.answer_votes}}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#k_means_oneModal{{ forloop.counter }}">{{ k_means_one.0.answer_body|truncatewords:5 }}</button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="k_means_oneModal{{ forloop.counter }}" role="dialog">
+                                        <div class="modal-dialog modal-lg">
+                                          <div class="modal-content">
+                                            <div class="modal-header">
+                                              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                              <h4 class="modal-title">Cuerpo:</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                              <p>{{ k_means_one.0.answer_body }}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                            </td>
+                          </tr>
+                      {% endfor %}
+                     </tbody>
+                 </table>
+                </div>
+            </div>
+
+            <div class="col-md-6" id="kmeans_div2">
+              <div class="table-responsive">
+              <table class="table">
+                <caption>Resultado clasificación por clústeres</caption>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Votos</th>
+                    <th>Cuerpo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                      {% for k_means_two in K_means_clustering_result.1%}
+                          <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{k_means_two.0.answer_votes}}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#k_means_twoModal{{ forloop.counter }}">{{ k_means_two.0.answer_body|truncatewords:5 }}</button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="k_means_twoModal{{ forloop.counter }}" role="dialog">
+                                        <div class="modal-dialog modal-lg">
+                                          <div class="modal-content">
+                                            <div class="modal-header">
+                                              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                              <h4 class="modal-title">Cuerpo:</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                              <p>{{ k_means_two.0.answer_body }}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                            </td>
+                          </tr>
+                      {% endfor %}
+                     </tbody>
+                 </table>
+                </div>
+            </div>
+
+            <div class="col-md-6" id="kmeans_div3">
+              <div class="table-responsive">
+              <table class="table">
+                <caption>Resultado clasificacion de respuestas estimada (Mejor candidato de cada cluster)</caption>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Votos</th>
+                    <th>Cuerpo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                      {% for k_means_three in K_means_clustering_result.2%}
+                          <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{k_means_three.0.answer_votes}}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#k_means_threeModal{{ forloop.counter }}">{{ k_means_three.0.answer_body|truncatewords:5 }}</button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="k_means_threeModal{{ forloop.counter }}" role="dialog">
+                                        <div class="modal-dialog modal-lg">
+                                          <div class="modal-content">
+                                            <div class="modal-header">
+                                              <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                              <h4 class="modal-title">Cuerpo:</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                              <p>{{ k_means_three.0.answer_body }}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                            </td>
+                          </tr>
+                      {% endfor %}
+                     </tbody>
+                 </table>
+                </div>
+            </div>
+        {% endif %}
+
+        </div>
+    {% endif %}
+
+<script>
+
+    $(document).ready(function(){
+     $("#gensim_button").click(function(){
+     $("#gensim_div1").toggle(1000);
+     $("#gensim_div2").toggle(1000);
+     });
+
+     $("#nltk_button").click(function(){
+     $("#nltk_div1").toggle(1000);
+     $("#nltk_div2").toggle(1000);
+     });
+
+     $("#merge_button").click(function(){
+     $("#merge_div1").toggle(1000);
+     $("#merge_div2").toggle(1000);
+     });
+
+     $("#kmeans_button").click(function(){
+     $("#kmeans_div1").toggle(1000);
+     $("#kmeans_div2").toggle(1000);
+     $("#kmeans_div3").toggle(1000);
+     });
+    });
+</script>
+
+{% endblock %}
