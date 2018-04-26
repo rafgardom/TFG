@@ -1,4 +1,7 @@
 import json
+
+from django import db
+
 import databaseConnection as dbc
 
 '''
@@ -165,6 +168,33 @@ def insert_answer(document, db_connection):
     parsed = json.loads(document.read())
     collection = db_connection.answer
     collection.insert(parsed)
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+insert_answer(document)
+
+** Descripcion del metodo **
+Inserta documentos en la coleccion "results"
+
+** Descripcion de parametros **
+document: documento a insertar (en formato JSON)
+db_connection: conexion con la base de datos
+
+**Return**
+None
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def insert_results(document, db_connection):
+    parsed = json.loads(document.read())
+    collection = db_connection.results
+    document = dbc.results_by_questionId(parsed['question_id'], db_connection)
+    if document:
+        print "hola"
+        collection.find_one_and_update(
+            {'quesion_id': parsed['question_id']}, {'$set': {'answers': parsed['answers']}}
+        )
+    else:
+        collection.insert(parsed)
 
 if __name__ == '__main__':
     db_connection = dbc.connection()

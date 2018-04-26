@@ -62,6 +62,26 @@ def question_answer_find_by_questionId(question_id, db_connection):
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+results_by_questionId(id, db_connection)
+
+** Descripcion del metodo **
+Realiza la busqueda del documento dentro de la coleccion 'results' filtrando por el id de la pregunta
+
+** Descripcion de parametros **
+question_id: identificador de la pregunta
+db_connection: conexion con la base de datos
+
+**Return**
+documento encontrado o None si no encuentra ninguno
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def results_by_questionId(question_id, db_connection):
+    db = db_connection
+    results = db.results.find_one({'question_id': question_id})
+    return results
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 find_all_api_data(db_connection)
 
 ** Descripcion del metodo **

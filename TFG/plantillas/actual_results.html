@@ -14,12 +14,20 @@
     font-style: italic;
     font-kerning: auto;
     font-family: inherit;
+    color:black;
 }
 
 .wrapper {
     text-align: center;
 }
 
+.ppal_button{
+    text-align: center;
+}
+
+.link_button{
+    text-align: center;
+}
 
 .btn {
     position: center;
@@ -42,7 +50,7 @@
   </div> {% endblock %}
 
 {% block contenido %}
-    <div class="wrapper">
+    <div class="wrapper ppal_button">
         <a href ="{% url selected_thread question_id %}" class='btn btn-danger'>
                                     Recalcular rankings
         </a>
@@ -50,14 +58,20 @@
         <button id="nltk_button" type="button" class="btn btn-success">Visualizar/Ocultar resultados nltk</button>
         <button id="merge_button" type="button" class="btn btn-success">Visualizar/Ocultar resultados similaridad (gensim) + nltk</button>
         <button id="kmeans_button" type="button" class="btn btn-success">Visualizar/Ocultar resultados Kmeans(Clustering)</button>
+        <br/>
+        <br/>
+
+    </div>
+    <div class="wrapper link_button">
+        <a href="{{question_link}}" class='btn btn-info' target="_blank">Enlace al hilo</a>
     </div>
     <br/>
     <br/>
     <div class="row">
       <div class="col-md-6">
       <div class="table-responsive">
-          <table class="table">
-          <caption>Ordenación de respuestas según la comunidad</caption>
+          <table class="table text-light">
+          <caption class="text-light">Ordenación de respuestas según la comunidad</caption>
             <thead>
               <tr class="info">
                 <th>#</th>

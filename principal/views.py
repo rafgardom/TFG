@@ -7,6 +7,7 @@ import databaseConnection as dbc
 import databaseInserts as dbi
 import generateJSON as gJSON
 import util as util
+import generateJSON as genJSON
 
 
 import generateJSON as gJson
@@ -93,6 +94,7 @@ def analyze_thread(request, id):
     question_title = dbc.question_answer_find_by_questionId(question_id, db)['question_title']
     question_code = dbc.question_answer_find_by_questionId(question_id, db)['question_code']
     question = dbc.question_answer_find_by_questionId(question_id, db)
+    question_link = dbc.api_data_find_by_questionId(question_id, db)['link']
 
     processed_question_code = util.question_code_processing(question_code)
     gensim_similarity_tf_idf_code_result = None
@@ -125,6 +127,14 @@ def analyze_thread(request, id):
         elif len(question['answers']) >= 5:
             K_means_clustering_result = util.K_means_clustering(question_body, question_title, answers,5)
 
+    genJSON.generate_results_json(answers, gensim_similarity_tf_idf_body_result,
+                                  gensim_similarity_tf_idf_code_result, nltk_title_analyze_title_result,
+                                  nltk_title_analyze_code_result, merge_gensim_nltk_title, merge_gensim_nltk_code,
+                                  K_means_clustering_result, question_id)
+
+    results = open("principal/results.json", 'r')
+    dbi.insert_results(results, db)
+
     return render_to_response('actual_results.html', {'answers': answers, 'gensim_similarity_tf_idf_body_result':gensim_similarity_tf_idf_body_result,
                                                       'gensim_similarity_tf_idf_code_result':gensim_similarity_tf_idf_code_result,
                                                       'nltk_title_analyze_title_result':nltk_title_analyze_title_result,
@@ -132,5 +142,6 @@ def analyze_thread(request, id):
                                                       'merge_gensim_nltk_title':merge_gensim_nltk_title,
                                                       'merge_gensim_nltk_code':merge_gensim_nltk_code,
                                                       'K_means_clustering_result':K_means_clustering_result,
-                                                      'question_id':question_id},
+                                                      'question_id':question_id,
+                                                      'question_link':question_link},
                               context_instance=RequestContext(request))

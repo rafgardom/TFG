@@ -1,5 +1,6 @@
 import getAnswer, getQuestion, getThreads
 import json
+from time import gmtime, strftime
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
@@ -71,6 +72,37 @@ def generate_processed_api_data_json(page = None, page_size = None, from_date = 
         json.dump(dic, outfile)
 
 
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+generate_results_json(answers, question_id)
+
+** Descripcion del metodo **
+Genera un archivo JSON que contiene los resultados de los rankings obtenidos tras el analisis de pregunta y respuestas
+
+**Return**
+None
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def generate_results_json(answers, gensim_similarity_tf_idf_body_result,
+                                  gensim_similarity_tf_idf_code_result, nltk_title_analyze_title_result,
+                                  nltk_title_analyze_code_result, merge_gensim_nltk_title, merge_gensim_nltk_code,
+                                  K_means_clustering_result, question_id, path = "principal/results.json"):
+
+    time_now = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+
+    result_dic = {'answers':answers, 'question_id': question_id,
+                  'gensim_similarity_tf_idf_body_result':gensim_similarity_tf_idf_body_result,
+                  'gensim_similarity_tf_idf_code_result':gensim_similarity_tf_idf_code_result,
+                  'nltk_title_analyze_title_result':nltk_title_analyze_title_result,
+                  'nltk_title_analyze_code_result':nltk_title_analyze_code_result,
+                  'merge_gensim_nltk_title':merge_gensim_nltk_title,
+                  'merge_gensim_nltk_code':merge_gensim_nltk_code,
+                  'K_means_clustering_result':K_means_clustering_result, 'time_now':time_now}
+
+
+    with open(path, 'w') as outfile:
+        json.dump(result_dic, outfile)
 
 
 if __name__ == '__main__':

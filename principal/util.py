@@ -158,7 +158,7 @@ def gensim_similarity_tf_idf(answers, question, raw = True):
 
         '''Ahora devolvemos las respuestas segun su orden de aparicion'''
         for i in sorted_similarity_answers:
-            result.append([answers[i[0]], i[1]])
+            result.append([answers[i[0]], str(i[1])])
         if raw == True:
             return result
         else:
@@ -215,7 +215,7 @@ def nltk_title_analyze(question, answers):
         index_processed_list = []
         for i in freq_dist_puntuation_list:
             index = answers.index(i[0])
-            index_processed_list.append([index, i[1]])
+            index_processed_list.append([index, str(i[1])])
 
         #print "Posicion de los resultados vs puntuacion:"
         #print index_processed_list
@@ -382,7 +382,7 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
             for answer in answers:
                 aux_answer = answer["answer_body"]
                 if aux_answer == n:
-                    final_result.append([answer, clustering_punctuation[i][1], i])
+                    final_result.append([answer, str(clustering_punctuation[i][1]), i])
 
     clustering_punctuation = sorted(clustering_punctuation, key=lambda answer: answer[1], reverse=True)
     #print clustering_punctuation
@@ -417,7 +417,7 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
 
 if __name__=='__main__':
     db = dbc.connection()
-    question_id = 16969060
+    question_id = 49971396
 
     answers = dbc.question_answer_find_by_questionId(question_id, db)['answers']
     question_body = dbc.question_answer_find_by_questionId(question_id, db)['question_body']
