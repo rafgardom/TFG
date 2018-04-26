@@ -25,7 +25,7 @@
     text-align: center;
 }
 
-.link_button{
+.alert{
     text-align: center;
 }
 
@@ -50,8 +50,22 @@
   </div> {% endblock %}
 
 {% block contenido %}
+    {% if delete_one %}
+        <div class="alert alert-success">Resultado eliminado correctamente</div>
+    {% endif %}
+
+    {% if delete_all %}
+        <div class="alert alert-success">Todos los resultados se han eliminado correctamente</div>
+    {% endif %}
 
     {% if results %}
+        <div class="wrapper ppal_button">
+            <a href ="{% url drop-results %}" class='btn btn-danger'>
+                                        Eliminar todo
+            </a>
+        </div>
+        <br/>
+        <br/>
         <div class="table-responsive">
           <table class="table">
             <thead>
@@ -62,6 +76,7 @@
                 <th>Código</th>
                 <th>Fecha</th>
                 <th>Selección de hilo</th>
+                <th>Eliminar resultado</th>
               </tr>
             </thead>
             <tbody>
@@ -127,8 +142,13 @@
                       {% endif %}
                         <td>{{row.time_now}}</td>
                         <td>
-                            <a href ="{% url selected_result row.question_id  %}" class='btn btn-primary target="_blank"'>
+                            <a href ="{% url selected_result row.question_id  %}" class='btn btn-primary'>
                                     Visualizar resultados
+                            </a>
+                        </td>
+                        <td>
+                            <a href ="{% url remove_result row.question_id  %}" class='btn btn-danger'>
+                                    Eliminar
                             </a>
                         </td>
                       </tr>

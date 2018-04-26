@@ -3,6 +3,18 @@
 {% load jsonify %}
 
 {% block titulo_apartado %}
+
+<style>
+
+.main-form{
+    margin-left:10px;
+}
+
+.alert-warning{
+    background-color: #f7eaaa;
+}
+
+</style>
   <div class="page-header">
       <h1>Trabajo de fin de grado:
           <small>
@@ -12,15 +24,38 @@
   </div> {% endblock %}
 
 {% block contenido %}
-    <div>
+    <div class="main-form">
         <form id="formulario" method ="post" enctype="multipart/form-data" action="">{% csrf_token %}
-            <table>
-                {{formulario}}
-            </table>
+                <div class="alert alert-info">
+                    <h4 class="alert-heading">Leyenda</h4>
+                    <ul>
+                        <li>Página: entero que indica la página de retorno de la búsqueda</li>
+                        <li>Tamaño página: entero con el número de hilos a recabar por página</li>
+                        <li>Desde: fecha de inicio de la búsqueda</li>
+                        <li>Hasta: fecha de fin de la búsqueda</li>
+                        <li>Texto libre: texto a introducir como parámetro de búsqueda</li>
+                        <li>Número de respuestas: entero con el número de respuestas que debe contener cada hilo</li>
+                        <li>Cuerpo de la pregunta: texto con palabras a contener en el cuerpo</li>
+                        <li>Etiquetas: etiquetas contenidas en los hilos (separar mediante ';')
+                            <br/>
+                            Únicamente válido para caracteres no numéricos</li>
+                        <li>Búsqueda por título: texto con palabras a contener en título</li>
+                    </ul>
+
+                </div>
+
+                <table>
+                    {{formulario}}
+                </table>
             <br/>
             <p><input type="submit" value="Buscar hilos!"></p>
+            <div class="alert alert-warning">
+                    La velocidad de búsqueda dependerá del tipo de hilo que ha indicado buscar, de su conexión a internet
+                    y del estado de los servidores de StackOverFlow
+                </div>
         </form>
     </div>
+
 
     <br/>
     <br/>

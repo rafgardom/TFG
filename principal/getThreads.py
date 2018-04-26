@@ -2,6 +2,7 @@
 import requests
 import json
 import ijson
+import re
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
@@ -76,9 +77,9 @@ def search_advanced_filter(page = None, page_size = None, from_date = None, to_d
         raw_url += "sort=" + sort
         param_cont += 1
 
-    if q != None and isinstance(q, str):
+    if q != None and not hasSpecialCharacters(str(q)):
         raw_url = add_aux_param(param_cont, raw_url)
-        raw_url += "q=" + q
+        raw_url += "q=" + str(q)
         param_cont += 1
 
     if accepted != None and (accepted == True or accepted == False):
@@ -91,9 +92,9 @@ def search_advanced_filter(page = None, page_size = None, from_date = None, to_d
         raw_url += "answers=" + str(answers)
         param_cont += 1
 
-    if body != None and isinstance(body, str):
+    if body != None and not hasSpecialCharacters(str(body)):
         raw_url = add_aux_param(param_cont, raw_url)
-        raw_url += "body=" + body
+        raw_url += "body=" + str(body)
         param_cont += 1
 
     if closed != None and (closed == True or closed == False):
@@ -111,14 +112,15 @@ def search_advanced_filter(page = None, page_size = None, from_date = None, to_d
         raw_url += "nottagged=" + not_tagged
         param_cont += 1
 
-    if tagged != None and isinstance(tagged, str):
+
+    if tagged != None and not hasNumbers(str(tagged) and not hasSpecialCharacters(str(tagged))):
         raw_url = add_aux_param(param_cont, raw_url)
-        raw_url += "tagged=" + tagged
+        raw_url += "tagged=" + str(tagged)
         param_cont += 1
 
-    if title != None and isinstance(title, str):
+    if title != None and not hasSpecialCharacters(title):
         raw_url = add_aux_param(param_cont, raw_url)
-        raw_url += "title=" + title
+        raw_url += "title=" + str(title)
         param_cont += 1
 
     if user != None and isinstance(user, int):
@@ -143,6 +145,36 @@ def search_advanced_filter(page = None, page_size = None, from_date = None, to_d
 
     raw_url += "&site=stackoverflow"
     return raw_url
+
+'''
+** Descripcion del metodo **
+Comprueba que la cadena pasada como parametro no contenga numeros
+
+** Descripcion de parametros **
+inputString: cadena de entrada
+
+**Return**
+Booleano que indica si contiene numeros (True) o no (False)
+'''
+def hasNumbers(inputString):
+    return any(char.isdigit() for char in inputString)
+
+'''
+** Descripcion del metodo **
+Comprueba que la cadena pasada como parametro no contenga caracteres especiales
+
+** Descripcion de parametros **
+inputString: cadena de entrada
+
+**Return**
+Booleano que indica si contiene caracteres especiales (True) o no (False)
+'''
+def hasSpecialCharacters(inputString):
+    result = False
+    regexp = re.compile(r'[@#\\$%&/\\(\\)=*\\ºª¬¿¡?!|]')
+    if regexp.search(inputString):
+        result = True
+    return result
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********

@@ -26,4 +26,10 @@ urlpatterns = patterns('',
 
     #Select old result
     url(r'^selected_result/(?P<id>\d+)/$', 'principal.views.view_result', name="selected_result"),
+
+    #Remove one result
+    url(r'^remove_result/(?P<id>\d+)/$', 'principal.views.remove_one_result', name="remove_result"),
+
+    #Drop collection results
+    url(r'^drop-results/', 'principal.views.drop_results', name='drop-results'),
 )

@@ -52,6 +52,7 @@ def main_view(request):
 
             #Conexion con API y generacion de archivos JSON
             db_connection = dbc.connection()
+
             gJson.generate_processed_api_data_json(page = page, page_size = pageSize, from_date = fecha_inicio, to_date = fecha_fin,
                            order = order, sort = sort, q = q, accepted = None, answers = answers, body = body, closed = None,
                            notice = None, not_tagged = None, tagged = tagged, title = title, user = None, url = None,
@@ -77,8 +78,7 @@ def main_view(request):
                 dbi.insert_question_answer(question_answer, db_connection)
                 question_answer = dbc.question_answer_find_by_questionId(document['question_id'],db_connection)
                 result_list.append([document, question_answer])
-                '''if len(result_list) == 2:
-                    break'''
+
 
     else:
         formulario = forms.api_search_form()
@@ -179,3 +179,22 @@ def view_result(request, id):
                                                 'merge_gensim_nltk_code':merge_gensim_nltk_code,
                                                 'K_means_clustering_result':K_means_clustering_result,
                                                 'question_id':question_id}, context_instance=RequestContext(request))
+
+def remove_one_result(request, id):
+    db = dbc.connection()
+    question_id = int(id)
+
+    dbc.remove_one_result(db, question_id)
+
+    results = dbc.find_all_results(db)
+
+    return render_to_response('results.html', {'results': results, 'delete_one': True},
+                              context_instance=RequestContext(request))
+
+
+def drop_results(request):
+    db = dbc.connection()
+    dbi.drop_results_data(db)
+
+    return render_to_response('results.html', {'delete_all': True},
+                              context_instance=RequestContext(request))

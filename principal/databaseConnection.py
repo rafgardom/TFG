@@ -98,11 +98,32 @@ lista con los documentos
 def find_all_results(db_connection):
     db = db_connection
     collection = db['results']
-    cursor = collection.find({})
+    cursor = collection.find({}).sort('time_now',pymongo.DESCENDING)
     result = []
     for document in cursor:
         result.append(document)
     return result
+
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+remove_one_result(db_connection)
+
+** Descripcion del metodo **
+Elimina un documento de la coleccion 'results'
+
+** Descripcion de parametros **
+db_connection: conexion con la base de datos
+question_id: identificador de la pregunta que hace referencia al documento a eliminar
+
+**Return**
+None
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def remove_one_result(db_connection, question_id):
+    db = db_connection
+    collection = db['results']
+    collection.delete_one({"question_id": question_id})
+
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********

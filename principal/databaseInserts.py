@@ -126,6 +126,23 @@ def drop_raw_api_data(db_connection):
 
 
 
+'''
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+drop_results_data(db_connection)
+
+** Descripcion del metodo **
+Elimina los documentos de la coleccion "results"
+
+** Descripcion de parametros **
+db_connection: conexion con la base de datos
+
+**Return**
+None
+/ ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
+'''
+def drop_results_data(db_connection):
+    db_connection.results.drop()
+
 
 '''
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
