@@ -92,29 +92,38 @@ def analyze_thread(request, id):
     question_body = dbc.question_answer_find_by_questionId(question_id, db)['question_body']
     question_title = dbc.question_answer_find_by_questionId(question_id, db)['question_title']
     question_code = dbc.question_answer_find_by_questionId(question_id, db)['question_code']
+    question = dbc.question_answer_find_by_questionId(question_id, db)
 
     processed_question_code = util.question_code_processing(question_code)
     gensim_similarity_tf_idf_code_result = None
     nltk_title_analyze_code_result = None
     merge_gensim_nltk_code = None
+    gensim_similarity_tf_idf_body_result = None
+    nltk_title_analyze_title_result = None
+    merge_gensim_nltk_title=None
+    K_means_clustering_result=None
 
     #Resultados de los analisis:
-    gensim_similarity_tf_idf_body_result = util.gensim_similarity_tf_idf(answers, question_body)
+    if(answers is not None):
+        gensim_similarity_tf_idf_body_result = util.gensim_similarity_tf_idf(answers, question_body)
 
-    if processed_question_code:
-        gensim_similarity_tf_idf_code_result = util.gensim_similarity_tf_idf(answers, processed_question_code)
+        if processed_question_code:
+            gensim_similarity_tf_idf_code_result = util.gensim_similarity_tf_idf(answers, processed_question_code)
 
-    nltk_title_analyze_title_result = util.nltk_title_analyze(question_title, answers)
+        nltk_title_analyze_title_result = util.nltk_title_analyze(question_title, answers)
 
-    if processed_question_code:
-        nltk_title_analyze_code_result = util.nltk_title_analyze(processed_question_code, answers)
+        if processed_question_code:
+            nltk_title_analyze_code_result = util.nltk_title_analyze(processed_question_code, answers)
 
-    merge_gensim_nltk_title = util.merge_results(gensim_similarity_tf_idf_body_result, nltk_title_analyze_title_result, answers)
+        merge_gensim_nltk_title = util.merge_results(gensim_similarity_tf_idf_body_result, nltk_title_analyze_title_result, answers)
 
-    if processed_question_code:
-        merge_gensim_nltk_code = util.merge_results(gensim_similarity_tf_idf_code_result, nltk_title_analyze_code_result, answers)
+        if processed_question_code:
+            merge_gensim_nltk_code = util.merge_results(gensim_similarity_tf_idf_code_result, nltk_title_analyze_code_result, answers)
 
-    K_means_clustering_result = util.K_means_clustering(question_body, question_title, answers, 5)
+        if len(question['answers']) <5 and len(question['answers'])>=2:
+            K_means_clustering_result = util.K_means_clustering(question_body, question_title, answers, len(question['answers']))
+        elif len(question['answers']) >= 5:
+            K_means_clustering_result = util.K_means_clustering(question_body, question_title, answers,5)
 
     return render_to_response('actual_results.html', {'answers': answers, 'gensim_similarity_tf_idf_body_result':gensim_similarity_tf_idf_body_result,
                                                       'gensim_similarity_tf_idf_code_result':gensim_similarity_tf_idf_code_result,
@@ -122,5 +131,6 @@ def analyze_thread(request, id):
                                                       'nltk_title_analyze_code_result':nltk_title_analyze_code_result,
                                                       'merge_gensim_nltk_title':merge_gensim_nltk_title,
                                                       'merge_gensim_nltk_code':merge_gensim_nltk_code,
-                                                      'K_means_clustering_result':K_means_clustering_result},
+                                                      'K_means_clustering_result':K_means_clustering_result,
+                                                      'question_id':question_id},
                               context_instance=RequestContext(request))

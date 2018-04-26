@@ -20,7 +20,7 @@ class api_search_form(forms.Form):
                                 }), label='Hasta')
     sort = forms.ModelChoiceField(required=False, queryset=Sort.objects.all(), label="Orden por parámetros")
     q = forms.CharField(required=False, max_length=50, label='Texto libre')
-    answers = forms.IntegerField(required = False, label='Número de respuestas')
+    answers = forms.IntegerField(required = False, label='Número de respuestas', min_value= 1)
     body = forms.CharField(max_length=50, required = False, label='Cuerpo de la pregunta')
     tagged = forms.CharField(max_length=100, required = False, label='Etiquetas contenidas (separar por ";")')
     title = forms.CharField(max_length=50, required = False, label='Búsqueda por título')
