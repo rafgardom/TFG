@@ -8,9 +8,52 @@ import databaseInserts as dbi
 import generateJSON as gJSON
 import util as util
 import generateJSON as genJSON
+import models
 
 
 import generateJSON as gJson
+
+def populate(request):
+    loaded_order_asc = models.Order.objects.filter(order_type="asc")
+    if loaded_order_asc:
+        loaded_order_asc.update(order_type="asc")
+    else:
+        models.Order.objects.create(order_type="asc")
+
+    loaded_order_desc = models.Order.objects.filter(order_type="desc")
+    if loaded_order_desc:
+        loaded_order_desc.update(order_type="desc")
+    else:
+        models.Order.objects.create(order_type="desc")
+
+    loaded_sort_activity = models.Sort.objects.filter(sort_type="activity")
+    if loaded_sort_activity:
+        loaded_sort_activity.update(sort_type="activity", spanish_name="actividad")
+    else:
+        models.Sort.objects.create(sort_type="activity", spanish_name="actividad")
+
+    loaded_sort_votes = models.Sort.objects.filter(sort_type="votes")
+    if loaded_sort_votes:
+        loaded_sort_votes.update(sort_type="votes", spanish_name="votos")
+    else:
+        models.Sort.objects.create(sort_type="votes", spanish_name="votos")
+
+    loaded_sort_creation = models.Sort.objects.filter(sort_type="creation")
+    if loaded_sort_creation:
+        loaded_sort_creation.update(sort_type="creation", spanish_name="creacion")
+    else:
+        models.Sort.objects.create(sort_type="creation", spanish_name="creation")
+
+    loaded_sort_relevance = models.Sort.objects.filter(sort_type="relevance")
+    if loaded_sort_relevance:
+        loaded_sort_relevance.update(sort_type="relevance", spanish_name="relevancia")
+    else:
+        models.Sort.objects.create(sort_type="relevance", spanish_name="relevancia")
+
+    formulario = forms.api_search_form()
+    return render_to_response('home.html', {'formulario': formulario},
+                              context_instance=RequestContext(request))
+
 
 def main_view(request):
     result_list = []

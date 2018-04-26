@@ -32,4 +32,7 @@ urlpatterns = patterns('',
 
     #Drop collection results
     url(r'^drop-results/', 'principal.views.drop_results', name='drop-results'),
+
+    #Populate Django DB
+    url(r'^populate/', 'principal.views.populate', name='populate'),
 )

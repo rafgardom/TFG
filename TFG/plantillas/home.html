@@ -10,6 +10,11 @@
     margin-left:10px;
 }
 
+.populate-div{
+    margin-left:10px;
+    text-align: left;
+}
+
 .alert-warning{
     background-color: #f7eaaa;
 }
@@ -24,6 +29,13 @@
   </div> {% endblock %}
 
 {% block contenido %}
+    <div class="populate-div">
+        <a href ="{% url populate %}" class='btn btn-warning'>
+                                        Poblar base de datos Django
+        </a> (Necesario para la visualización del formulario)
+        <br/>
+        <br/>
+    </div>
     <div class="main-form">
         <form id="formulario" method ="post" enctype="multipart/form-data" action="">{% csrf_token %}
                 <div class="alert alert-info">
@@ -139,7 +151,7 @@
                           </td>
                       {% endif %}
                         <td>
-                            <a href ="{% url selected_thread row.0.question_id  %}" class='btn btn-primary target="_blank"'>
+                            <a href ="{% url selected_thread row.0.question_id  %}" class='btn btn-primary'>
                                     Seleccionar
                             </a>
                         </td>

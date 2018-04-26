@@ -21,8 +21,8 @@
     text-align: center;
 }
 
-.ppal_button{
-    text-align: center;
+.ppal_button_delete{
+    text-align: left;
 }
 
 .alert{
@@ -59,7 +59,7 @@
     {% endif %}
 
     {% if results %}
-        <div class="wrapper ppal_button">
+        <div class="wrapper ppal_button_delete">
             <a href ="{% url drop-results %}" class='btn btn-danger'>
                                         Eliminar todo
             </a>
