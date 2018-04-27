@@ -50,6 +50,13 @@
   </div> {% endblock %}
 
 {% block contenido %}
+    {% if total_time %}
+        <div class="alert alert-danger">
+            Tiempo total de ejecución: {{ total_time|floatformat }} segundos
+        </div>
+        <br/>
+        <br/>
+    {% endif %}
     <div class="wrapper ppal_button">
         <a href ="{% url selected_thread question_id %}" class='btn btn-danger'>
                                     Recalcular rankings

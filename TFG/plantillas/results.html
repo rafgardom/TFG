@@ -60,7 +60,11 @@
 
     {% if results %}
         <div class="wrapper ppal_button_delete">
-            <a href ="{% url drop-results %}" class='btn btn-danger'>
+            <a href ="{% url drop-results %}"
+               onclick="return confirm('Va a eliminar todos los resultados. Si borra los datos no podrán volver a' +
+                'ser recuperados a menos que se realice el análisis de todos los hilos de nuevo.' +
+                 '\n ¿Está seguro?')"
+               class='btn btn-danger'>
                                         Eliminar todo
             </a>
         </div>
@@ -147,7 +151,11 @@
                             </a>
                         </td>
                         <td>
-                            <a href ="{% url remove_result row.question_id  %}" class='btn btn-danger'>
+                            <a href ="{% url remove_result row.question_id  %}"
+                               onclick="return confirm('Va a eliminar el resultado. Si borra los datos no podrán volver' +
+                                ' a ser recuperados a menos que se realice el análisis del mismo hilo de nuevo' +
+                                 '\n ¿Está seguro?')"
+                               class='btn btn-danger'>
                                     Eliminar
                             </a>
                         </td>

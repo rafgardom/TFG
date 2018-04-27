@@ -9,11 +9,13 @@ import generateJSON as gJSON
 import util as util
 import generateJSON as genJSON
 import models
+import time
 
 
 import generateJSON as gJson
 
 def populate(request):
+    start_time = time.time()
     loaded_order_asc = models.Order.objects.filter(order_type="asc")
     if loaded_order_asc:
         loaded_order_asc.update(order_type="asc")
@@ -50,14 +52,18 @@ def populate(request):
     else:
         models.Sort.objects.create(sort_type="relevance", spanish_name="relevancia")
 
+    end_time = time.time()
+    total_time = end_time-start_time
     formulario = forms.api_search_form()
-    return render_to_response('home.html', {'formulario': formulario},
+    return render_to_response('home.html', {'formulario': formulario, 'total_time':total_time},
                               context_instance=RequestContext(request))
 
 
 def main_view(request):
     result_list = []
+    total_time = None
     if request.method == 'POST':
+        start_time = time.time()
         formulario = forms.api_search_form(request.POST)
         if formulario.is_valid():
             cd = formulario.cleaned_data
@@ -121,17 +127,19 @@ def main_view(request):
                 dbi.insert_question_answer(question_answer, db_connection)
                 question_answer = dbc.question_answer_find_by_questionId(document['question_id'],db_connection)
                 result_list.append([document, question_answer])
-
+            end_time = time.time()
+            total_time = end_time - start_time
 
     else:
         formulario = forms.api_search_form()
 
-    return render_to_response('home.html',{'formulario':formulario, 'result_list':result_list, 'begin':0}, context_instance=RequestContext(request))
+    return render_to_response('home.html',{'formulario':formulario, 'result_list':result_list,
+                                           'total_time':total_time}, context_instance=RequestContext(request))
 
 def analyze_thread(request, id):
     db = dbc.connection()
     question_id = int(id)
-
+    start_time = time.time()
     answers = dbc.question_answer_find_by_questionId(question_id, db)['answers']
     question_body = dbc.question_answer_find_by_questionId(question_id, db)['question_body']
     question_title = dbc.question_answer_find_by_questionId(question_id, db)['question_title']
@@ -180,6 +188,8 @@ def analyze_thread(request, id):
     results = open("principal/results.json", 'r')
     dbi.insert_results(results, db)
 
+    end_time = time.time()
+    total_time = end_time - start_time
     return render_to_response('actual_results.html', {'answers': answers, 'gensim_similarity_tf_idf_body_result':gensim_similarity_tf_idf_body_result,
                                                       'gensim_similarity_tf_idf_code_result':gensim_similarity_tf_idf_code_result,
                                                       'nltk_title_analyze_title_result':nltk_title_analyze_title_result,
@@ -188,7 +198,8 @@ def analyze_thread(request, id):
                                                       'merge_gensim_nltk_code':merge_gensim_nltk_code,
                                                       'K_means_clustering_result':K_means_clustering_result,
                                                       'question_id':question_id,
-                                                      'question_link':question_link},
+                                                      'question_link':question_link,
+                                                      'total_time':total_time},
                               context_instance=RequestContext(request))
 
 
