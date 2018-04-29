@@ -320,17 +320,13 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
     for answer in answers:
         answer_body = str(answer["answer_body"].encode("utf-8"))
         answers_document.append(answer_body)
-    question_documents = [title, body]
-    #tfidf_question_vectorizer = TfidfVectorizer(stop_words='english')
-    #tfidf_answer_vectorizer = TfidfVectorizer(stop_words='english')
+
     tfidf_answer_vectorizer = TfidfVectorizer(max_df=0.8, max_features=200000,
                     min_df=0.2, stop_words='english',
                     use_idf=True, tokenizer=tokenize_and_stem, ngram_range=(1, 3))
-    #vectoriced_question_document = tfidf_question_vectorizer.fit_transform(question_documents)
+
     vectoriced_answers_document = tfidf_answer_vectorizer.fit_transform(answers_document)
 
-    #question_model = KMeans(n_clusters=2, init='k-means++', max_iter=100, n_init=1)
-    #question_model.fit(vectoriced_question_document)
 
     answer_model = KMeans(n_clusters=cluster_number, init='k-means++', max_iter=100, n_init=1)
     answer_model.fit(vectoriced_answers_document)

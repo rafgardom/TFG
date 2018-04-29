@@ -62,6 +62,10 @@ def populate(request):
 def main_view(request):
     result_list = []
     total_time = None
+
+    # Conexion con API y generacion de archivos JSON
+    db_connection = dbc.connection()
+
     if request.method == 'POST':
         start_time = time.time()
         formulario = forms.api_search_form(request.POST)
@@ -99,9 +103,6 @@ def main_view(request):
             if not sort:
                 sort = "activity"
 
-            #Conexion con API y generacion de archivos JSON
-            db_connection = dbc.connection()
-
             gJson.generate_processed_api_data_json(page = page, page_size = pageSize, from_date = fecha_inicio, to_date = fecha_fin,
                            order = order, sort = sort, q = q, accepted = None, answers = answers, body = body, closed = None,
                            notice = None, not_tagged = None, tagged = tagged, title = title, user = None, url = None,
@@ -132,6 +133,10 @@ def main_view(request):
 
     else:
         formulario = forms.api_search_form()
+        api_data_documents = dbc.find_all_api_data(db_connection)
+        for document in api_data_documents:
+            question_answer = dbc.question_answer_find_by_questionId(document['question_id'], db_connection)
+            result_list.append([document, question_answer])
 
     return render_to_response('home.html',{'formulario':formulario, 'result_list':result_list,
                                            'total_time':total_time}, context_instance=RequestContext(request))
@@ -186,6 +191,7 @@ def analyze_thread(request, id):
                                   K_means_clustering_result, question_id, question_prepared_dic)
 
     results = open("principal/results.json", 'r')
+    print results
     dbi.insert_results(results, db)
 
     end_time = time.time()

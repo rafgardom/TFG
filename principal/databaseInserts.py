@@ -206,10 +206,19 @@ def insert_results(document, db_connection):
     collection = db_connection.results
     document = dbc.results_by_questionId(parsed['question_id'], db_connection)
     if document:
-        print "hola"
-        collection.find_one_and_update(
-            {'quesion_id': parsed['question_id']}, {'$set': {'answers': parsed['answers']}}
-        )
+        print "actualiza"
+        dbc.remove_one_result(db_connection,parsed['question_id'])
+        '''collection.find_one_and_update(
+            {'quesion_id': parsed['question_id']}, {'$set': {'answers': parsed['answers'], 'time_now':parsed['time_now'],
+                                                             'merge_gensim_nltk_code':parsed['merge_gensim_nltk_code'],
+                                                             'gensim_similarity_tf_idf_code_result':parsed['gensim_similarity_tf_idf_code_result'],
+                                                             'nltk_title_analyze_title_result':parsed['nltk_title_analyze_title_result'],
+                                                             'K_means_clustering_result':parsed['K_means_clustering_result'],
+                                                             'gensim_similarity_tf_idf_body_result':parsed['gensim_similarity_tf_idf_body_result'],
+                                                             'nltk_title_analyze_code_result':parsed['nltk_title_analyze_code_result'],
+                                                             'merge_gensim_nltk_title':parsed['merge_gensim_nltk_title']}}
+        )'''
+        collection.insert(parsed)
     else:
         collection.insert(parsed)
 
