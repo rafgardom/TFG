@@ -168,10 +168,10 @@ def analyze_thread(request, id):
         if processed_question_code:
             gensim_similarity_tf_idf_code_result = util.gensim_similarity_tf_idf(answers, processed_question_code)
 
-        nltk_title_analyze_title_result = util.nltk_title_analyze(question_title, answers)
+        nltk_title_analyze_title_result = util.nltk_question_analyze(question_body, answers)
 
         if processed_question_code:
-            nltk_title_analyze_code_result = util.nltk_title_analyze(processed_question_code, answers)
+            nltk_title_analyze_code_result = util.nltk_question_analyze(processed_question_code, answers)
 
         merge_gensim_nltk_title = util.merge_results(gensim_similarity_tf_idf_body_result, nltk_title_analyze_title_result, answers)
 
@@ -191,7 +191,6 @@ def analyze_thread(request, id):
                                   K_means_clustering_result, question_id, question_prepared_dic)
 
     results = open("principal/results.json", 'r')
-    print results
     dbi.insert_results(results, db)
 
     end_time = time.time()

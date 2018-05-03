@@ -1,7 +1,4 @@
 import json
-
-from django import db
-
 import databaseConnection as dbc
 
 '''
@@ -206,7 +203,6 @@ def insert_results(document, db_connection):
     collection = db_connection.results
     document = dbc.results_by_questionId(parsed['question_id'], db_connection)
     if document:
-        print "actualiza"
         dbc.remove_one_result(db_connection,parsed['question_id'])
         '''collection.find_one_and_update(
             {'quesion_id': parsed['question_id']}, {'$set': {'answers': parsed['answers'], 'time_now':parsed['time_now'],

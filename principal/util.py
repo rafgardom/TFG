@@ -171,8 +171,8 @@ def gensim_similarity_tf_idf(answers, question, raw = True):
 nltk_title_analyze(question, answers)
 
 ** Descripcion del metodo **
-Analiza las palabras del titulo de la pregunta y clasifica las respuestas segun el numero de apariciones que tengan las palabras
-del titulo de la pregunta.
+Analiza las palabras de la pregunta y clasifica las respuestas segun el numero de apariciones que tengan las palabras
+de la pregunta en las respuestas.
 A mayor numero de aparicion tenga la palabra en el titulo de la pregunta mayor peso tiene esa palabra a la hora de calcular
 la puntuacion.
 
@@ -185,7 +185,7 @@ Lista de respuestas ordenadas segun su puntuacion de frecuencia de palabras resp
 La lista es una lista de listas de respuestas con su puntuacion de frecuencia: [[answer, punctuation]]
 / ******** ******** ******** ******** ******** ******** ******** ******** ******** ********
 '''
-def nltk_title_analyze(question, answers):
+def nltk_question_analyze(question, answers):
     if question != None:
         if len(question) > 1:
             token_question = tokenize_text(question)
@@ -194,9 +194,9 @@ def nltk_title_analyze(question, answers):
 
         text = Text(token_question)
 
-        title_frequence_dist = nltk.FreqDist(text)
-        first_title_frequence_dist = title_frequence_dist.most_common(20)
-        #print "Frecuencia de las palabras del titulo de la pregunta:"
+        question_frequence_dist = nltk.FreqDist(text)
+        first_title_frequence_dist = question_frequence_dist.most_common(20)
+        #print "Frecuencia de las palabras de la pregunta:"
         #print first_title_frequence_dist
 
         freq_dist_puntuation_list = []
@@ -348,7 +348,7 @@ def K_means_clustering(question_body, question_title, answers, cluster_number):
     #print "Clasificacion de respuestas en clusteres:"
     #print frame
 
-    clustered_answers_dict = {}
+    clustered_answers_dict = {} #pregunta con la puntuacion tf-idf obtenida
     for i in range(cluster_number):
         clustered_answers = []
         for n in frame.ix[i].get_values():
@@ -424,24 +424,24 @@ if __name__=='__main__':
     gensim_similarity_tf_idf_code_result = None
     nltk_title_analyze_code_result = None
 
-    print "***Analisis por similaridad con distancia tf-idf respecto al cuerpo de la pregunta***"
+    print "***Analisis por similaridad con tf-idf respecto al cuerpo de la pregunta***"
     gensim_similarity_tf_idf_body_result = gensim_similarity_tf_idf(answers, question_body)
     print gensim_similarity_tf_idf_body_result
     print " "
 
-    print "***Analisis por similaridad con distancia tf-idf respecto al codigo de la pregunta***"
+    print "***Analisis por similaridad tf-idf respecto al codigo de la pregunta***"
     if processed_question_code:
         gensim_similarity_tf_idf_code_result = gensim_similarity_tf_idf(answers, processed_question_code)
         print gensim_similarity_tf_idf_code_result
         print " "
 
-    print "***Analisis por frecuencia de aparicion de palabras del titulo de la pregunta***"
-    nltk_title_analyze_title_result = nltk_title_analyze(question_title, answers)
+    print "***Analisis por frecuencia de aparicion de palabras del cuerpo de la pregunta***"
+    nltk_title_analyze_title_result = nltk_question_analyze(question_body, answers)
     print nltk_title_analyze_title_result
     print " "
     if processed_question_code:
         print "***Analisis por frecuencia de aparicion de palabras del codigo de la pregunta***"
-        nltk_title_analyze_code_result = nltk_title_analyze(processed_question_code, answers)
+        nltk_title_analyze_code_result = nltk_question_analyze(processed_question_code, answers)
         print nltk_title_analyze_code_result
         print " "
 
