@@ -248,6 +248,7 @@ def question_code_processing(question_code):
         result = result.replace("(", "")
         result = result.replace(")", "")
         result = result.replace(":", "")
+        result = result.replace(";", "")
     return result
 
 
