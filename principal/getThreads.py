@@ -113,7 +113,7 @@ def search_advanced_filter(page = None, page_size = None, from_date = None, to_d
         param_cont += 1
 
 
-    if tagged != None and not hasNumbers(str(tagged) and not hasSpecialCharacters(str(tagged))):
+    if tagged != None and not hasNumbers(str(tagged)) and not hasSpecialCharacters(str(tagged)):
         raw_url = add_aux_param(param_cont, raw_url)
         raw_url += "tagged=" + str(tagged)
         param_cont += 1
