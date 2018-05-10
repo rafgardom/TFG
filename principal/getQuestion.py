@@ -37,8 +37,9 @@ def get_question(url, question_id):
     question_comments = None
     raw_comments = raw_question.find('ul', attrs={'class': 'comments-list js-comments-list'})
 
-    if len(raw_comments.get_text()) > 1:
-        question_comments = [get_html_text(qc) for qc in raw_comments.find_all('div', attrs={'class':'comment-body'})]
+    if(raw_comments):
+        if len(raw_comments.get_text()) > 1:
+            question_comments = [get_html_text(qc) for qc in raw_comments.find_all('div', attrs={'class':'comment-body'})]
 
     result = {'question_title':question_title, 'question_body': question_body, 'question_code':question_code,
               'question_comments':question_comments, 'question_id': question_id}
