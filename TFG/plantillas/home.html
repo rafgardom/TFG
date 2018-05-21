@@ -33,7 +33,7 @@
     <div class="populate-div">
         <a href ="{% url populate %}"
            onclick="return confirm('Va a repoblar la base de datos de Django, ¿está seguro? Esta base de datos no ' +
-            'almacena ningún dato referente a los hilos o los rankings de respuestas sino sirve para que la aplicación' +
+            'almacena ningún dato referente a los hilos o los rankings de respuestas sino que sirve para que la aplicación' +
              'web funcione de forma correcta.' +
               '\n ¿Está seguro?')"
            class='btn btn-warning'>
@@ -44,6 +44,7 @@
     </div>
     <div class="main-form">
         <form id="formulario" method ="post" enctype="multipart/form-data" action="">{% csrf_token %}
+                <h2>Formulario de búsqueda</h2>
                 <div class="alert alert-info">
                     <h4 class="alert-heading">Leyenda</h4>
                     <ul>
@@ -66,7 +67,7 @@
                     {{formulario}}
                 </table>
             <br/>
-            <p><input type="submit" value="Buscar hilos!"></p>
+            <p><input type="submit" value="Buscar hilos"></p>
             <div class="alert alert-warning">
                     La velocidad de búsqueda dependerá del tipo de hilo que ha indicado buscar, de su conexión a internet
                     y del estado de los servidores de StackOverFlow. Para acelerar el proceso debe seleccionar un tamaño
